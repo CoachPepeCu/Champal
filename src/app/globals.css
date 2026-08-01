@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #172e56;
+
+  --color-primary: #172e56;
+  --color-primary-light: #2a4a7f;
+  --color-accent: #d91f27;
+  --color-accent-light: #e8474e;
+  --color-info: #2f7dd1;
+  --color-warm: #e08a2c;
+  --color-teal: #16897e;
+  --color-gold: #d4af5c;
+  --color-gold-light: #eecf8e;
+
+  --color-neutral-50: #f8f9fb;
+  --color-neutral-100: #eef0f4;
+  --color-neutral-200: #dde1e8;
+  --color-neutral-400: #98a2b3;
+  --color-neutral-600: #667085;
+  --color-neutral-900: #1d2433;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-accent: var(--color-accent);
+  --color-accent-light: var(--color-accent-light);
+  --color-info: var(--color-info);
+  --color-warm: var(--color-warm);
+  --color-teal: var(--color-teal);
+  --color-gold: var(--color-gold);
+  --color-gold-light: var(--color-gold-light);
+  --color-neutral-50: var(--color-neutral-50);
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-200: var(--color-neutral-200);
+  --color-neutral-400: var(--color-neutral-400);
+  --color-neutral-600: var(--color-neutral-600);
+  --color-neutral-900: var(--color-neutral-900);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-lora);
+  --font-display: var(--font-baloo);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@keyframes text-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.text-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-gold) 0%,
+    var(--color-gold) 35%,
+    #fff8e1 50%,
+    var(--color-gold) 65%,
+    var(--color-gold) 100%
+  );
+  background-size: 250% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: text-shimmer 3.5s linear infinite;
+}
+
+.font-soft3d {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: transparent;
+  background-image: linear-gradient(180deg, #fff6d0 0%, #ffdd55 30%, #f7a91e 75%, #f0921a 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-stroke: 1.5px #7a3d10;
+  filter: drop-shadow(0 2px 0 #8a4a14) drop-shadow(0 5px 8px rgba(4, 12, 30, 0.45));
+}
