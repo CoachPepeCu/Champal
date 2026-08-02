@@ -13,6 +13,8 @@
   --color-teal: #16897e;
   --color-gold: #d4af5c;
   --color-gold-light: #eecf8e;
+  --color-plataforma: #a94f4f;
+  --color-plataforma-light: #bd6868;
 
   --color-neutral-50: #f8f9fb;
   --color-neutral-100: #eef0f4;
@@ -34,6 +36,8 @@
   --color-teal: var(--color-teal);
   --color-gold: var(--color-gold);
   --color-gold-light: var(--color-gold-light);
+  --color-plataforma: var(--color-plataforma);
+  --color-plataforma-light: var(--color-plataforma-light);
   --color-neutral-50: var(--color-neutral-50);
   --color-neutral-100: var(--color-neutral-100);
   --color-neutral-200: var(--color-neutral-200);

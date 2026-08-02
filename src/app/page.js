@@ -1,9 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import StatsRow from "@/components/StatsRow";
-import TodayInChampal from "@/components/TodayInChampal";
-import QuickAccessGrid from "@/components/QuickAccessGrid";
-import MonthGallery from "@/components/MonthGallery";
 import WhyChampal from "@/components/WhyChampal";
 import HistoryTimeline from "@/components/HistoryTimeline";
 import GlobalReach from "@/components/GlobalReach";
@@ -22,9 +19,6 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <StatsRow />
-        <TodayInChampal />
-        <QuickAccessGrid />
-        <MonthGallery />
         <WhyChampal />
         <HistoryTimeline />
         <GlobalReach />

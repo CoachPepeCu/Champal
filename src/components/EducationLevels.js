@@ -185,7 +185,7 @@ function LevelCard({ level }) {
 
 export default function EducationLevels() {
   return (
-    <section id="academico" className="bg-neutral-50 py-10 lg:py-14">
+    <section id="niveles-educativos" className="bg-neutral-50 py-10 lg:py-14">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
