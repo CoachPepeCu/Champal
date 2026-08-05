@@ -2,12 +2,40 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #172e56;
+  --foreground: #141c2a; /* ink.900 — texto principal, Design System v2 §2.3 */
 
-  --color-primary: #172e56;
-  --color-primary-light: #2a4a7f;
-  --color-accent: #d91f27;
-  --color-accent-light: #e8474e;
+  /* Design System v2 — confirmado en docs/Champal_Design_System.md (§2.1, §2.2) */
+  --color-primary: #102c54; /* navy.900 — títulos, fondos oscuros puntuales */
+  --color-primary-light: #214a80; /* navy.700 — hover / acentos azules */
+  --color-accent: #c1151f; /* red.600 — rojo institucional, CTA */
+  --color-accent-light: #d83b42; /* red.500 — hover / acentos rojos */
+
+  /* Escala completa v2, disponible para nuevos componentes */
+  --color-navy-900: #102c54;
+  --color-navy-800: #163b6b;
+  --color-navy-700: #214a80;
+  --color-navy-600: #2b5b98;
+  --color-navy-100: #e8eef6;
+
+  --color-red-700: #aa181f;
+  --color-red-600: #c1151f;
+  --color-red-500: #d83b42;
+  --color-red-100: #f7dcdd;
+
+  --color-ink-900: #141c2a;
+  --color-ink-700: #535c6d;
+  --color-ink-500: #8b95a4;
+  --color-line-300: #d8dde4;
+  --color-surface-100: #f3f5f7;
+  --color-surface-warm-50: #e9e9e9; /* v2 "warm.50" — no confundir con --color-warm (naranja, legado) */
+  --color-gris-oscuro: #494949;
+
+  --color-state-success: #258e52;
+  --color-state-warning: #c98119;
+  --color-state-error: var(--color-red-600);
+  --color-state-info: var(--color-navy-600);
+
+  /* ⚠️ Sin reemplazo confirmado en v2 (docs/Champal_Design_System.md §2.5) — no tocar hasta cerrar ese punto */
   --color-info: #2f7dd1;
   --color-warm: #e08a2c;
   --color-teal: #16897e;
@@ -31,6 +59,31 @@
   --color-primary-light: var(--color-primary-light);
   --color-accent: var(--color-accent);
   --color-accent-light: var(--color-accent-light);
+
+  --color-navy-900: var(--color-navy-900);
+  --color-navy-800: var(--color-navy-800);
+  --color-navy-700: var(--color-navy-700);
+  --color-navy-600: var(--color-navy-600);
+  --color-navy-100: var(--color-navy-100);
+
+  --color-red-700: var(--color-red-700);
+  --color-red-600: var(--color-red-600);
+  --color-red-500: var(--color-red-500);
+  --color-red-100: var(--color-red-100);
+
+  --color-ink-900: var(--color-ink-900);
+  --color-ink-700: var(--color-ink-700);
+  --color-ink-500: var(--color-ink-500);
+  --color-line-300: var(--color-line-300);
+  --color-surface-100: var(--color-surface-100);
+  --color-surface-warm-50: var(--color-surface-warm-50);
+  --color-gris-oscuro: var(--color-gris-oscuro);
+
+  --color-state-success: var(--color-state-success);
+  --color-state-warning: var(--color-state-warning);
+  --color-state-error: var(--color-state-error);
+  --color-state-info: var(--color-state-info);
+
   --color-info: var(--color-info);
   --color-warm: var(--color-warm);
   --color-teal: var(--color-teal);
@@ -44,9 +97,13 @@
   --color-neutral-400: var(--color-neutral-400);
   --color-neutral-600: var(--color-neutral-600);
   --color-neutral-900: var(--color-neutral-900);
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-lora);
-  --font-display: var(--font-baloo);
+
+  --font-sans: var(--font-outfit);
+  --font-display: var(--font-fredoka);
+  /* Alias temporal: las clases font-serif ya usadas en los componentes (títulos/labels)
+     migran a Fredoka. Pendiente un pase de renombrado a font-display para claridad semántica —
+     ver docs/Champal_Design_System.md §3. */
+  --font-serif: var(--font-fredoka);
 }
 
 body {

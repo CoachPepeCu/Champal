@@ -1,20 +1,16 @@
-import { Inter, Lora, Baloo_2 } from "next/font/google";
+import { Outfit, Fredoka } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const lora = Lora({
-  variable: "--font-lora",
+const fredoka = Fredoka({
+  variable: "--font-fredoka",
   subsets: ["latin"],
-});
-
-const baloo = Baloo_2({
-  variable: "--font-baloo",
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata = {
@@ -27,7 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${lora.variable} ${baloo.variable} h-full antialiased`}
+      className={`${outfit.variable} ${fredoka.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
