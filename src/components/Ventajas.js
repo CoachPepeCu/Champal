@@ -55,12 +55,12 @@ export default function Ventajas() {
         variants={reduceMotion ? undefined : sectionVariants}
         className="mx-auto max-w-[1232px] px-6 sm:px-10 py-16 lg:py-20"
       >
-        <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-16">
-          <div className="flex flex-col gap-3 lg:w-1/2">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-10">
+          <div className="flex flex-col gap-4 lg:w-1/2">
             <p className="font-display font-semibold text-[15px] uppercase tracking-[0.3px] text-red-500">
               Formación Integral
             </p>
-            <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[46px] leading-[1.15] text-primary">
+            <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[48px] leading-[1.15] text-primary">
               Una formación completa para un mundo que exige mucho más.
             </h2>
             <p className="text-base sm:text-lg lg:text-[22px] tracking-[0.44px] text-gris-oscuro">
@@ -70,7 +70,7 @@ export default function Ventajas() {
           </div>
 
           <video
-            className="w-full lg:w-1/2 aspect-[644/480] rounded-[10px] object-cover"
+            className="w-full lg:w-1/2 aspect-[644/480] rounded-[28px] object-cover"
             src="/videos/ventajas-video.mp4"
             autoPlay
             muted
@@ -85,23 +85,23 @@ export default function Ventajas() {
           whileInView={reduceMotion ? undefined : "show"}
           viewport={{ once: true, amount: 0.2 }}
           variants={reduceMotion ? undefined : cardContainer}
-          className="mt-10 lg:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+          className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
         >
           {CARDS.map(({ icon, title, text }) => (
             <motion.div
               key={title}
               variants={reduceMotion ? undefined : cardItem}
-              className="flex flex-col gap-4 rounded-[10px] bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.07)]"
+              className="flex flex-col gap-1.5 rounded-[20px] bg-white p-6 shadow-[0px_12px_24px_3px_rgba(0,0,0,0.15)]"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-start gap-3.5">
                 <Image
                   src={icon}
                   alt=""
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 shrink-0"
+                  width={56}
+                  height={56}
+                  className="h-14 w-14 shrink-0 object-cover"
                 />
-                <h3 className="font-display font-semibold text-lg text-primary">
+                <h3 className="font-display font-semibold text-[20px] text-primary">
                   {title}
                 </h3>
               </div>
