@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import Ventajas from "@/components/Ventajas";
 import StatsRow from "@/components/StatsRow";
 import WhyChampal from "@/components/WhyChampal";
 import HistoryTimeline from "@/components/HistoryTimeline";
@@ -18,6 +19,7 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         <Hero />
+        <Ventajas />
         <StatsRow />
         <WhyChampal />
         <HistoryTimeline />
