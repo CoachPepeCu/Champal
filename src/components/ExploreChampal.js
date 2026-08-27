@@ -9,13 +9,13 @@ const cqw = (px) => `${((px / CANVAS_W) * 100).toFixed(4)}cqw`;
 const IMAGE_ROOT = "/images/conoce-champal";
 
 const ISLANDS = [
-  { name: "Campus", src: `${IMAGE_ROOT}/campus-exterior.png`, left: 96, top: 17, width: 300, height: 300 },
-  { name: "Vida Champal", src: `${IMAGE_ROOT}/vida-champal.png`, left: 96, top: 336, width: 300, height: 300 },
-  { name: "Convenios", src: `${IMAGE_ROOT}/convenios.png`, left: 1025, top: 36, width: 300, height: 300 },
-  { name: "Certificaciones", src: `${IMAGE_ROOT}/certificaciones.png`, left: 1025, top: 396, width: 300, height: 300 },
+  { name: "Campus", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300 },
+  { name: "Vida Champal", src: `${IMAGE_ROOT}/vida-champal.webp`, left: 96, top: 336, width: 300, height: 300 },
+  { name: "Convenios", src: `${IMAGE_ROOT}/convenios.webp`, left: 1025, top: 36, width: 300, height: 300 },
+  { name: "Certificaciones", src: `${IMAGE_ROOT}/certificaciones.webp`, left: 1025, top: 396, width: 300, height: 300 },
   {
     name: "Actividades extracurriculares",
-    src: `${IMAGE_ROOT}/actividades-extracurriculares.png`,
+    src: `${IMAGE_ROOT}/actividades-extracurriculares.webp`,
     left: 571,
     top: 472,
     width: 300,
@@ -82,7 +82,7 @@ const SECTION_BACKGROUND =
 function EducationalBackground() {
   return (
     <Image
-      src={`${IMAGE_ROOT}/fondo-educativo.png`}
+      src={`${IMAGE_ROOT}/fondo-educativo.webp`}
       alt=""
       fill
       sizes="100vw"
@@ -174,7 +174,7 @@ export default function ExploreChampal() {
           style={{ left: pctX(524), top: pctY(116), width: cqw(393), height: cqw(322) }}
         >
           <Image
-            src={`${IMAGE_ROOT}/campus-central.png`}
+            src={`${IMAGE_ROOT}/campus-central.webp`}
             alt="Campus central de Colegio Champal"
             fill
             sizes="27.3vw"
@@ -195,7 +195,7 @@ export default function ExploreChampal() {
 
         <div className="relative z-20 mx-auto aspect-[393/322] w-[82%] max-w-[393px]">
           <Image
-            src={`${IMAGE_ROOT}/campus-central.png`}
+            src={`${IMAGE_ROOT}/campus-central.webp`}
             alt="Campus central de Colegio Champal"
             fill
             sizes="82vw"
