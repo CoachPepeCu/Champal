@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="481" height="836" viewBox="0 0 481 836" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Pleca_Derecha" filter="url(#filter0_d_0_25)">
+<path d="M32 17L449 17C449 17 410.068 28.6387 420 276.443C423.073 353.12 338.241 399.136 262.5 404.808C178 411.136 151.5 434.64 171.5 545.829C186.972 631.844 198 685.946 151.5 709.45C128.706 730.579 105.5 736.569 32 789V17Z" fill="#E3E3E3"/>
+</g>
+<defs>
+<filter id="filter0_d_0_25" x="0" y="0" width="481" height="836" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="15"/>
+<feGaussianBlur stdDeviation="16"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_25"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_25" result="shape"/>
+</filter>
+</defs>
+</svg>

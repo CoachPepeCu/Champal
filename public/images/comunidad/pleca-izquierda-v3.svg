@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="713" height="824" viewBox="0 0 713 824" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Pleca_Izquierda" filter="url(#filter0_d_0_24)">
+<path d="M17 32H541.375C541.375 32 592 169 552.09 261.5C516.461 344.079 388.35 404.5 410.5 476.5C451.877 611 654.555 600 664.6 671.5C674.646 743 629.776 745 557.448 792H17V32Z" fill="#E3E3E3"/>
+</g>
+<defs>
+<filter id="filter0_d_0_24" x="0" y="0" width="713" height="824" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="15"/>
+<feGaussianBlur stdDeviation="16"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_24"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_24" result="shape"/>
+</filter>
+</defs>
+</svg>

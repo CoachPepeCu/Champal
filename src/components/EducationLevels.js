@@ -114,6 +114,7 @@ function LevelCard({ level }) {
 
   return (
     <motion.div
+      id={level.slug}
       variants={item}
       className="h-[440px] w-full [perspective:1600px] sm:h-[480px]"
       onMouseEnter={() => setFlipped(true)}

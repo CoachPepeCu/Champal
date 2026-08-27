@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 104px; /* despeja el header fijo (88px) + aire */
+}
+
+/* El scrollbar NATIVO de Chrome/Windows dibuja un bisel/borde delgado justo
+   donde termina el contenido y empieza el track — confirmado ocultando el
+   scrollbar por completo (overflow-y:hidden) y viendo desaparecer la línea:
+   no es nada del código de la página, es el propio scrollbar del SO/
+   navegador. Darle estilo propio con ::-webkit-scrollbar (track transparente)
+   NO alcanzó — el bisel seguía ahí incluso con el track transparente, así
+   que se oculta directamente (el scroll sigue funcionando por rueda/teclado/
+   barra táctil, solo no se dibuja la barra) para que no quede ese filo
+   contra secciones de color saturado (ej. 02_Comunidad). */
+html {
+  scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome/Edge/Safari */
+}
+
 :root {
   --background: #ffffff;
   --foreground: #141c2a; /* ink.900 — texto principal, Design System v2 §2.3 */
@@ -104,6 +126,8 @@
      migran a Fredoka. Pendiente un pase de renombrado a font-display para claridad semántica —
      ver docs/Champal_Design_System.md §3. */
   --font-serif: var(--font-fredoka);
+  /* Manuscrita — solo para el texto dentro de la nube-globo de diálogo. */
+  --font-hand: var(--font-patrick-hand);
 }
 
 body {
@@ -119,6 +143,78 @@ body {
   100% {
     background-position: -200% 0;
   }
+}
+
+/* Scroll infinito del mapa de puntos del globo (GlobalReach). Se usa un
+   @keyframes nativo en vez de animar `x` con Framer Motion: el snap de
+   -50% a 0% en cada vuelta se compone por CSS/GPU de forma exacta, sin el
+   micro-salto visible que puede producir un reset manejado por JS. */
+@keyframes globe-scroll {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-globe-scroll {
+  animation: globe-scroll 26s linear infinite;
+}
+
+/* Carrusel infinito de tarjetas (Pre-Kinder, "04_Todo Comienza"). Misma
+   técnica que globe-scroll: la pista duplica sus tarjetas y recorre 0% a
+   -50%, así el loop es exacto sin salto visible. La dirección (izquierda/
+   derecha) se controla con animation-direction desde el propio componente,
+   y se pausa por completo al pasar el mouse sobre cualquier tarjeta. */
+@keyframes cards-marquee {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-cards-marquee {
+  animation: cards-marquee 55s linear infinite;
+}
+
+.animate-cards-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-globe-scroll,
+  .animate-cards-marquee {
+    animation: none;
+  }
+}
+
+/* Caja de scroll de texto con "líneas y controles en gris suave" — el
+   riel (track) y el control (thumb) del scrollbar en tonos grises tenues,
+   usado en el párrafo largo de Pre-Kinder / 05_Ingles. */
+.soft-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #c3cad4 transparent;
+}
+
+.soft-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.soft-scrollbar::-webkit-scrollbar-track {
+  background: #e9edf2;
+  border-radius: 99px;
+}
+
+.soft-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #c3cad4;
+  border-radius: 99px;
+}
+
+.soft-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #a9b3c1;
 }
 
 .text-shimmer {

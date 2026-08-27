@@ -1,0 +1,26 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="230" height="230" viewBox="0 0 230 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Borde_Hundido">
+<g filter="url(#filter0_ii_0_4)">
+<path d="M0 36.96C0 22.9743 0 15.9815 3.06368 10.8011C4.95001 7.61147 7.61147 4.95001 10.8011 3.06368C15.9815 0 22.9743 0 36.96 0H193.04C207.026 0 214.019 0 219.199 3.06368C222.389 4.95001 225.05 7.61147 226.936 10.8011C230 15.9815 230 22.9743 230 36.96V193.04C230 207.026 230 214.019 226.936 219.199C225.05 222.389 222.389 225.05 219.199 226.936C214.019 230 207.026 230 193.04 230H36.96C22.9743 230 15.9815 230 10.8011 226.936C7.61147 225.05 4.95001 222.389 3.06368 219.199C0 214.019 0 207.026 0 193.04V36.96Z" fill="#E3E3E3"/>
+</g>
+<path d="M36.96 0.5H193.04C200.042 0.5 205.259 0.500559 209.375 0.880859C213.484 1.26054 216.444 2.01553 218.944 3.49414C222.061 5.3376 224.662 7.93854 226.506 11.0557C227.984 13.5559 228.739 16.5165 229.119 20.625C229.499 24.7405 229.5 29.958 229.5 36.96V193.04C229.5 200.042 229.499 205.259 229.119 209.375C228.739 213.484 227.984 216.444 226.506 218.944C224.662 222.061 222.061 224.662 218.944 226.506C216.444 227.984 213.484 228.739 209.375 229.119C205.259 229.499 200.042 229.5 193.04 229.5H36.96C29.958 229.5 24.7405 229.499 20.625 229.119C16.5165 228.739 13.5559 227.984 11.0557 226.506C7.93854 224.662 5.3376 222.061 3.49414 218.944C2.01553 216.444 1.26054 213.484 0.880859 209.375C0.500559 205.259 0.5 200.042 0.5 193.04V36.96C0.5 29.958 0.500559 24.7405 0.880859 20.625C1.26054 16.5165 2.01553 13.5559 3.49414 11.0557C5.3376 7.93854 7.93854 5.3376 11.0557 3.49414C13.5559 2.01553 16.5165 1.26054 20.625 0.880859C23.7116 0.595638 27.418 0.523827 32.0322 0.505859L36.96 0.5Z" stroke="#C2C4C9" stroke-opacity="0.55"/>
+</g>
+<defs>
+<filter id="filter0_ii_0_4" x="-10" y="-10" width="250" height="251" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="10" dy="11"/>
+<feGaussianBlur stdDeviation="9"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.38 0 0 0 0 0.41 0 0 0 0 0.46 0 0 0 0.2 0"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_0_4"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="-10" dy="-10"/>
+<feGaussianBlur stdDeviation="9"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0"/>
+<feBlend mode="normal" in2="effect1_innerShadow_0_4" result="effect2_innerShadow_0_4"/>
+</filter>
+</defs>
+</svg>

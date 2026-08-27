@@ -1,0 +1,259 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          width: 1920px;
+          height: 1080px;
+          overflow: hidden;
+          background: #060d1c;
+          font-family: "Montserrat", sans-serif;
+        }
+        .scene-root {
+          position: absolute;
+          inset: 0;
+          transform-origin: 50% 50%;
+          will-change: filter, transform;
+        }
+        .photo-stack {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          z-index: 0;
+          isolation: isolate;
+        }
+        .photo {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          will-change: transform, filter;
+        }
+        .scrim {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to top,
+            rgba(4, 7, 15, 0.97) 0%,
+            rgba(4, 7, 15, 0.9) 20%,
+            rgba(4, 7, 15, 0.52) 40%,
+            rgba(4, 7, 15, 0.08) 62%,
+            rgba(4, 7, 15, 0.34) 100%
+          );
+        }
+        .vignette {
+          position: absolute;
+          inset: -4%;
+          background: radial-gradient(
+            ellipse at 50% 45%,
+            rgba(0, 0, 0, 0) 42%,
+            rgba(3, 6, 14, 0.6) 100%
+          );
+        }
+        .grain {
+          position: absolute;
+          inset: 0;
+          opacity: 0.05;
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+          background-size: 300px 300px;
+        }
+        .text-scrim {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 52%;
+          background: linear-gradient(
+            to top,
+            rgba(3, 6, 13, 0.94) 0%,
+            rgba(3, 6, 13, 0.72) 45%,
+            rgba(3, 6, 13, 0) 100%
+          );
+        }
+        .glow {
+          position: absolute;
+          left: 50px;
+          bottom: -220px;
+          width: 1100px;
+          height: 900px;
+          background: radial-gradient(
+            circle,
+            rgba(231, 193, 105, 0.55) 0%,
+            rgba(231, 193, 105, 0) 70%
+          );
+          opacity: 0;
+          z-index: 1;
+        }
+        .text-block {
+          position: absolute;
+          left: 120px;
+          bottom: 108px;
+          max-width: 1450px;
+          z-index: 2;
+          transform-origin: 0% 100%;
+        }
+        .accent-rule {
+          width: 92px;
+          height: 4px;
+          background: #e7c169;
+          margin-bottom: 26px;
+          transform: scaleX(0);
+          transform-origin: 0% 50%;
+        }
+        .headline {
+          font-family: "League Gothic", sans-serif;
+          font-weight: 400;
+          font-size: 192px;
+          line-height: 0.92;
+          color: #f7f4ec;
+          text-transform: uppercase;
+          letter-spacing: 0.01em;
+          opacity: 0;
+        }
+        .subline {
+          font-family: "Montserrat", sans-serif;
+          font-weight: 300;
+          font-size: 34px;
+          letter-spacing: 0.01em;
+          color: #f7f4ec;
+          opacity: 0;
+          margin-top: 46px;
+        }
+      </style>
+
+      <div id="root" data-composition-id="04-trascender" data-width="1920" data-height="1080">
+        <div class="scene-root" id="t-scene-root">
+          <div class="photo-stack">
+            <img
+              class="photo"
+              id="t-photo-a"
+              src="assets/images/grad-01-laughing.jpg"
+              style="z-index: 1; --dof: 0px; filter: blur(var(--dof)); object-position: 50% 35%"
+            />
+            <img
+              class="photo"
+              id="t-photo-b"
+              src="assets/images/grad-02-diploma.jpg"
+              style="z-index: 2; opacity: 0; --dof: 10px; filter: blur(var(--dof)); object-position: 60% 30%"
+            />
+          </div>
+          <div class="scrim"></div>
+          <div class="vignette" data-layout-allow-overflow></div>
+          <div class="text-scrim"></div>
+          <div class="grain"></div>
+          <div class="glow" id="tr-glow"></div>
+
+          <div class="text-block">
+            <div class="accent-rule" id="tr-rule"></div>
+            <div class="headline" id="tr-headline">Trascender</div>
+            <div class="subline" id="tr-subline">Preparados para transformar el mundo.</div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          window.__timelines = window.__timelines || {};
+          var tl = gsap.timeline({ paused: true });
+          var DURATION = 4.5;
+
+          tl.fromTo(
+            "#t-scene-root",
+            { filter: "blur(10px)", scale: 1.035 },
+            { filter: "blur(0px)", scale: 1, duration: 0.3, ease: "power3.out" },
+            0,
+          );
+          tl.to(
+            "#t-scene-root",
+            { filter: "blur(10px)", scale: 1.035, duration: 0.3, ease: "power2.in" },
+            DURATION - 0.3,
+          );
+
+          // Slower, more solemn Ken Burns push.
+          tl.fromTo("#t-photo-a", { scale: 1.0 }, { scale: 1.09, duration: DURATION, ease: "none" }, 0);
+          tl.fromTo(
+            "#t-photo-b",
+            { scale: 1.04 },
+            { scale: 1.13, duration: DURATION, ease: "none" },
+            0,
+          );
+
+          var RACK_START = 2.15,
+            RACK_DUR = 0.55;
+          tl.to(
+            "#t-photo-a",
+            { opacity: 0, "--dof": "10px", duration: RACK_DUR, ease: "power2.inOut" },
+            RACK_START,
+          );
+          tl.to(
+            "#t-photo-b",
+            { opacity: 1, "--dof": "0px", duration: RACK_DUR, ease: "power2.inOut" },
+            RACK_START,
+          );
+
+          // Title — spring-pop entrance (calm settle: power3.out, no overshoot).
+          var POP_AT = 0.45,
+            POP_DUR = 0.55;
+          tl.fromTo(
+            "#tr-headline",
+            { scale: 0.9, opacity: 0, y: 10 },
+            { scale: 1, opacity: 1, y: 0, duration: POP_DUR, ease: "power3.out" },
+            POP_AT,
+          );
+          tl.fromTo(
+            "#tr-subline",
+            { opacity: 0, y: 18 },
+            { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+            POP_AT + POP_DUR - 0.1,
+          );
+          tl.fromTo(
+            "#tr-rule",
+            { scaleX: 0 },
+            { scaleX: 1, duration: 0.4, ease: "power3.out" },
+            POP_AT + POP_DUR + 0.05,
+          );
+
+          // Ambient glow bloom behind the text, landing on the headline's settle.
+          var BLOOM_START = 0.2,
+            BLOOM_DUR = POP_AT + POP_DUR - BLOOM_START;
+          tl.fromTo(
+            "#tr-glow",
+            { opacity: 0, scale: 0.85 },
+            { opacity: 0.3, scale: 1, duration: BLOOM_DUR, ease: "power2.out" },
+            BLOOM_START,
+          );
+          var glow = document.getElementById("tr-glow");
+          var phase = { p: 0 };
+          var BREATHE_START = BLOOM_START + BLOOM_DUR;
+          var BREATHE_DUR = Math.max(0, DURATION - 0.3 - BREATHE_START);
+          if (BREATHE_DUR > 0.4) {
+            tl.to(
+              phase,
+              {
+                p: Math.PI * 2 * (BREATHE_DUR / 2.8),
+                duration: BREATHE_DUR,
+                ease: "none",
+                onUpdate: function () {
+                  var s = Math.sin(phase.p);
+                  glow.style.opacity = String(0.3 + s * 0.04);
+                  glow.style.transform = "scale(" + (1 + s * 0.02) + ")";
+                },
+              },
+              BREATHE_START,
+            );
+          }
+
+          window.__timelines["04-trascender"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

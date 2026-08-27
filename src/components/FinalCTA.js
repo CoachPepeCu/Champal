@@ -6,7 +6,7 @@ import GlowButton from "./GlowButton";
 
 export default function FinalCTA() {
   return (
-    <section className="relative overflow-hidden py-20 lg:py-28">
+    <section data-nav-theme="dark" className="relative overflow-hidden py-20 lg:py-28">
       <div className="absolute inset-0">
         <Image
           src="/images/campus-aereo.jpg"

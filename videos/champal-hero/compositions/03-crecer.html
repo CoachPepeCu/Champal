@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          width: 1920px;
+          height: 1080px;
+          overflow: hidden;
+          background: #060d1c;
+          font-family: "Montserrat", sans-serif;
+        }
+        .scene-root {
+          position: absolute;
+          inset: 0;
+          transform-origin: 50% 50%;
+          will-change: filter, transform;
+          overflow: hidden;
+        }
+        .photo-stack {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          z-index: 0;
+          isolation: isolate;
+        }
+        .photo {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          will-change: transform, filter;
+        }
+        .scrim {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to top,
+            rgba(4, 7, 15, 0.97) 0%,
+            rgba(4, 7, 15, 0.9) 20%,
+            rgba(4, 7, 15, 0.5) 40%,
+            rgba(4, 7, 15, 0.06) 62%,
+            rgba(4, 7, 15, 0.3) 100%
+          );
+        }
+        .vignette {
+          position: absolute;
+          inset: -4%;
+          background: radial-gradient(
+            ellipse at 50% 45%,
+            rgba(0, 0, 0, 0) 45%,
+            rgba(3, 6, 14, 0.55) 100%
+          );
+        }
+        .grain {
+          position: absolute;
+          inset: 0;
+          opacity: 0.05;
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+          background-size: 300px 300px;
+        }
+        .text-scrim {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 52%;
+          background: linear-gradient(
+            to top,
+            rgba(3, 6, 13, 0.94) 0%,
+            rgba(3, 6, 13, 0.72) 45%,
+            rgba(3, 6, 13, 0) 100%
+          );
+        }
+        .text-block {
+          position: absolute;
+          left: 120px;
+          bottom: 108px;
+          max-width: 1400px;
+        }
+        .accent-rule {
+          width: 92px;
+          height: 4px;
+          background: #da2026;
+          margin-bottom: 26px;
+          transform: scaleX(0);
+          transform-origin: 0% 50%;
+        }
+        .headline {
+          font-family: "League Gothic", sans-serif;
+          font-weight: 400;
+          font-size: 208px;
+          line-height: 0.92;
+          color: #f7f4ec;
+          text-transform: uppercase;
+          letter-spacing: 0.01em;
+          opacity: 0;
+        }
+        .subline {
+          font-family: "Montserrat", sans-serif;
+          font-weight: 300;
+          font-size: 34px;
+          letter-spacing: 0.01em;
+          color: #f7f4ec;
+          opacity: 0;
+          margin-top: 46px;
+        }
+      </style>
+
+      <div id="root" data-composition-id="03-crecer" data-width="1920" data-height="1080">
+        <div class="scene-root" id="c-scene-root">
+          <svg width="0" height="0" aria-hidden="true" style="position: absolute">
+            <filter id="streak-crecer" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur id="c-streak-blur" in="SourceGraphic" stdDeviation="0 0" />
+            </filter>
+          </svg>
+          <div class="photo-stack">
+            <img
+              class="photo"
+              id="c-photo-a"
+              src="assets/images/06-crecer-fists-up.png"
+              style="z-index: 1; --dof: 0px; filter: blur(var(--dof))"
+            />
+            <img
+              class="photo"
+              id="c-photo-b"
+              src="assets/images/07-crecer-girl-pointing.png"
+              style="z-index: 2; opacity: 0; filter: url(#streak-crecer)"
+            />
+          </div>
+          <div class="scrim"></div>
+          <div class="vignette" data-layout-allow-overflow></div>
+          <div class="text-scrim"></div>
+          <div class="grain"></div>
+
+          <div class="text-block">
+            <div class="accent-rule" id="c-rule"></div>
+            <div class="headline" id="c-headline">Crecer</div>
+            <div class="subline" id="c-subline">Carácter. Valores. Confianza.</div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          window.__timelines = window.__timelines || {};
+          var tl = gsap.timeline({ paused: true });
+
+          tl.fromTo(
+            "#c-scene-root",
+            { filter: "blur(10px)", scale: 1.035 },
+            { filter: "blur(0px)", scale: 1, duration: 0.3, ease: "power3.out" },
+            0,
+          );
+          tl.to(
+            "#c-scene-root",
+            { filter: "blur(10px)", scale: 1.035, duration: 0.3, ease: "power2.in" },
+            3.7,
+          );
+
+          // Ken Burns — slightly faster push than scenes 1-2 (rising energy).
+          tl.fromTo("#c-photo-a", { scale: 1.0 }, { scale: 1.14, duration: 4, ease: "none" }, 0);
+          tl.fromTo("#c-photo-b", { scale: 1.02 }, { scale: 1.16, duration: 4, ease: "none" }, 0);
+
+          // Photo A exits on a quick focus-pull fade.
+          var CUT_AT = 1.75,
+            FADE_DUR = 0.35;
+          tl.to(
+            "#c-photo-a",
+            { opacity: 0, "--dof": "10px", duration: FADE_DUR, ease: "power2.inOut" },
+            CUT_AT,
+          );
+
+          // Photo B — motion-blur-streak entrance (Path A: directional SVG blur), snapping sharp.
+          var blurNode = document.getElementById("c-streak-blur");
+          var blurProxy = { v: 20 };
+          var writeBlur = function () {
+            blurNode.setAttribute("stdDeviation", blurProxy.v + " 0");
+          };
+          writeBlur();
+          tl.fromTo(
+            "#c-photo-b",
+            { x: 90, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.4, ease: "power4.out" },
+            CUT_AT,
+          );
+          tl.to(
+            blurProxy,
+            { v: 0, duration: 0.4, ease: "power4.out", onUpdate: writeBlur },
+            CUT_AT,
+          );
+
+          tl.set("#c-headline", { opacity: 1, y: 70 }, 0.4);
+          tl.to("#c-headline", { y: 0, duration: 0.16, ease: "power4.out" }, 0.4);
+          tl.set("#c-subline", { opacity: 1, y: 40 }, 0.4 + 0.16 - 1 / 60);
+          tl.to(
+            "#c-subline",
+            { y: 0, duration: 0.14, ease: "power4.out" },
+            0.4 + 0.16 - 1 / 60,
+          );
+          tl.fromTo(
+            "#c-rule",
+            { scaleX: 0 },
+            { scaleX: 1, duration: 0.35, ease: "power3.out" },
+            0.28,
+          );
+
+          window.__timelines["03-crecer"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

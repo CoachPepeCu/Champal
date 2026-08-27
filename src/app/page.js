@@ -1,11 +1,12 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import Bienvenidos from "@/components/Bienvenidos";
+import Comunidad from "@/components/Comunidad";
+import Niveles from "@/components/Niveles";
 import Ventajas from "@/components/Ventajas";
 import StatsRow from "@/components/StatsRow";
 import WhyChampal from "@/components/WhyChampal";
 import HistoryTimeline from "@/components/HistoryTimeline";
-import GlobalReach from "@/components/GlobalReach";
-import EducationLevels from "@/components/EducationLevels";
 import Testimonials from "@/components/Testimonials";
 import ExploreChampal from "@/components/ExploreChampal";
 import AdmissionsSteps from "@/components/AdmissionsSteps";
@@ -19,12 +20,13 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         <Hero />
+        <Bienvenidos />
+        <Comunidad />
+        <Niveles />
         <Ventajas />
         <StatsRow />
         <WhyChampal />
         <HistoryTimeline />
-        <GlobalReach />
-        <EducationLevels />
         <Testimonials />
         <ExploreChampal />
         <AdmissionsSteps />

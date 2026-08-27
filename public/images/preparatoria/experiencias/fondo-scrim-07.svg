@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="654" height="786" viewBox="0 0 654 786" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Pleca_oscura" opacity="0.56" filter="url(#filter0_f_0_4)">
+<path d="M15 15H639C289.659 255.651 324.189 514.573 590.286 771H94.9999C50.8172 771 15 735.183 15 691V15Z" fill="url(#paint0_linear_0_4)"/>
+</g>
+<defs>
+<filter id="filter0_f_0_4" x="0" y="0" width="654" height="786" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="7.5" result="effect1_foregroundBlur_0_4"/>
+</filter>
+<linearGradient id="paint0_linear_0_4" x1="154.007" y1="42.5838" x2="378.168" y2="692.402" gradientUnits="userSpaceOnUse">
+<stop stop-color="#023D86"/>
+<stop offset="1" stop-color="#000F20"/>
+</linearGradient>
+</defs>
+</svg>

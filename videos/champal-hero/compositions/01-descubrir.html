@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          width: 1920px;
+          height: 1080px;
+          overflow: hidden;
+          background: #060d1c;
+          font-family: "Montserrat", sans-serif;
+        }
+        .scene-root {
+          position: absolute;
+          inset: 0;
+          transform-origin: 50% 50%;
+          will-change: filter, transform;
+        }
+        .photo-stack {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          z-index: 0;
+          isolation: isolate;
+        }
+        .photo {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          will-change: transform, filter;
+        }
+        .scrim {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to top,
+            rgba(4, 7, 15, 0.97) 0%,
+            rgba(4, 7, 15, 0.9) 20%,
+            rgba(4, 7, 15, 0.5) 40%,
+            rgba(4, 7, 15, 0.06) 62%,
+            rgba(4, 7, 15, 0.3) 100%
+          );
+        }
+        .vignette {
+          position: absolute;
+          inset: -4%;
+          background: radial-gradient(
+            ellipse at 50% 45%,
+            rgba(0, 0, 0, 0) 45%,
+            rgba(3, 6, 14, 0.55) 100%
+          );
+        }
+        .grain {
+          position: absolute;
+          inset: 0;
+          opacity: 0.05;
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+          background-size: 300px 300px;
+        }
+        .text-scrim {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 52%;
+          background: linear-gradient(
+            to top,
+            rgba(3, 6, 13, 0.94) 0%,
+            rgba(3, 6, 13, 0.72) 45%,
+            rgba(3, 6, 13, 0) 100%
+          );
+        }
+        .text-block {
+          position: absolute;
+          left: 120px;
+          bottom: 108px;
+          max-width: 1400px;
+        }
+        .accent-rule {
+          width: 92px;
+          height: 4px;
+          background: #e7c169;
+          margin-bottom: 26px;
+          transform: scaleX(0);
+          transform-origin: 0% 50%;
+        }
+        .headline {
+          font-family: "League Gothic", sans-serif;
+          font-weight: 400;
+          font-size: 208px;
+          line-height: 0.92;
+          color: #f7f4ec;
+          text-transform: uppercase;
+          letter-spacing: 0.01em;
+          opacity: 0;
+        }
+        .subline {
+          font-family: "Montserrat", sans-serif;
+          font-weight: 300;
+          font-size: 34px;
+          letter-spacing: 0.01em;
+          color: #f7f4ec;
+          opacity: 0;
+          margin-top: 46px;
+        }
+      </style>
+
+      <div id="root" data-composition-id="01-descubrir" data-width="1920" data-height="1080">
+        <div class="scene-root" id="d-scene-root">
+          <div class="photo-stack">
+            <img
+              class="photo"
+              id="d-photo-a"
+              src="assets/images/01-descubrir-cheer.png"
+              style="z-index: 1; --dof: 0px; filter: blur(var(--dof))"
+            />
+            <img
+              class="photo"
+              id="d-photo-b"
+              src="assets/images/05-descubrir-toddler-bow.png"
+              style="z-index: 2; opacity: 0; --dof: 10px; filter: blur(var(--dof))"
+            />
+          </div>
+          <div class="scrim"></div>
+          <div class="vignette" data-layout-allow-overflow></div>
+          <div class="text-scrim"></div>
+          <div class="grain"></div>
+
+          <div class="text-block">
+            <div class="accent-rule" id="d-rule"></div>
+            <div class="headline" id="d-headline">Descubrir</div>
+            <div class="subline" id="d-subline">Todo comienza con la curiosidad.</div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          window.__timelines = window.__timelines || {};
+          var tl = gsap.timeline({ paused: true });
+
+          // Whole-frame velocity-matched entry/exit blur (matches sibling scenes' cut).
+          tl.fromTo(
+            "#d-scene-root",
+            { filter: "blur(10px)", scale: 1.035 },
+            { filter: "blur(0px)", scale: 1, duration: 0.3, ease: "power3.out" },
+            0,
+          );
+          tl.to(
+            "#d-scene-root",
+            { filter: "blur(10px)", scale: 1.035, duration: 0.3, ease: "power2.in" },
+            3.7,
+          );
+
+          // Ken Burns — photo A slow zoom, full scene span (continues under the crossfade).
+          tl.fromTo("#d-photo-a", { scale: 1.0 }, { scale: 1.12, duration: 4, ease: "none" }, 0);
+          // Photo B zoom continues past the handoff.
+          tl.fromTo("#d-photo-b", { scale: 1.05 }, { scale: 1.16, duration: 4, ease: "none" }, 0);
+
+          // Focus-pull crossfade (depth-of-field-blur rack mechanic) between the two photos.
+          var RACK_START = 1.9,
+            RACK_DUR = 0.5;
+          tl.to(
+            "#d-photo-a",
+            { opacity: 0, "--dof": "10px", duration: RACK_DUR, ease: "power2.inOut" },
+            RACK_START,
+          );
+          tl.to(
+            "#d-photo-b",
+            { opacity: 1, "--dof": "0px", duration: RACK_DUR, ease: "power2.inOut" },
+            RACK_START,
+          );
+
+          // Title — waterfall-entry (anchor headline + light-word subline).
+          tl.set("#d-headline", { opacity: 1, y: 70 }, 0.42);
+          tl.to("#d-headline", { y: 0, duration: 0.18, ease: "power4.out" }, 0.42);
+          tl.set("#d-subline", { opacity: 1, y: 40 }, 0.42 + 0.18 - 1 / 60);
+          tl.to(
+            "#d-subline",
+            { y: 0, duration: 0.15, ease: "power4.out" },
+            0.42 + 0.18 - 1 / 60,
+          );
+          tl.fromTo(
+            "#d-rule",
+            { scaleX: 0 },
+            { scaleX: 1, duration: 0.4, ease: "power3.out" },
+            0.3,
+          );
+
+          window.__timelines["01-descubrir"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

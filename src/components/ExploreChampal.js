@@ -23,6 +23,7 @@ const LINKS = [
 
 const BANNERS = [
   {
+    id: null,
     tag: "Club Rayados Monterrey",
     title: "Formamos atletas con disciplina, pasión y carácter.",
     cta: "Conoce más",
@@ -32,6 +33,7 @@ const BANNERS = [
     to: "#0a1730",
   },
   {
+    id: "international-high-school",
     tag: "International High School",
     title: "Educación global para líderes del mañana.",
     cta: "Descubre el programa",
@@ -131,9 +133,10 @@ export default function ExploreChampal() {
           viewport={{ once: true, amount: 0.3 }}
           className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6"
         >
-          {BANNERS.map(({ tag, title, cta, image, objectPosition, from, to }) => (
+          {BANNERS.map(({ id, tag, title, cta, image, objectPosition, from, to }) => (
             <motion.div
               key={tag}
+              id={id ?? undefined}
               variants={item}
               className="group relative overflow-hidden rounded-2xl p-8 lg:p-10 text-white min-h-[260px] flex flex-col justify-end"
             >

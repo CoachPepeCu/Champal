@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          width: 1920px;
+          height: 1080px;
+          overflow: hidden;
+          background: #0b1b33;
+          font-family: "Montserrat", sans-serif;
+        }
+        .vignette {
+          position: absolute;
+          inset: -4%;
+          background: radial-gradient(
+            ellipse at 50% 45%,
+            rgba(0, 0, 0, 0) 40%,
+            rgba(3, 6, 14, 0.5) 100%
+          );
+        }
+        .grain {
+          position: absolute;
+          inset: 0;
+          opacity: 0.045;
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+          background-size: 300px 300px;
+        }
+        .curtain {
+          position: absolute;
+          inset: 0;
+          background: #06101f;
+          z-index: 5;
+        }
+        .glow {
+          position: absolute;
+          left: 50%;
+          top: 46%;
+          width: 1400px;
+          height: 1100px;
+          transform: translate(-50%, -50%);
+          background: radial-gradient(
+            circle,
+            rgba(231, 193, 105, 0.4) 0%,
+            rgba(231, 193, 105, 0) 68%
+          );
+          opacity: 0;
+          z-index: 1;
+        }
+        .lockup-wrap {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .badge-35 {
+          width: 300px;
+          height: auto;
+          margin-bottom: 30px;
+          opacity: 0;
+        }
+        .divider {
+          width: 130px;
+          height: 3px;
+          background: #e7c169;
+          margin-bottom: 30px;
+          transform: scaleX(0);
+        }
+        .logo-mark {
+          width: 480px;
+          height: auto;
+          margin-bottom: 58px;
+          opacity: 0;
+        }
+        .headline-35 {
+          font-family: "League Gothic", sans-serif;
+          font-weight: 400;
+          font-size: 168px;
+          line-height: 0.9;
+          color: #f7f4ec;
+          letter-spacing: 0.02em;
+          opacity: 0;
+        }
+        .subline-35 {
+          font-family: "Montserrat", sans-serif;
+          font-weight: 800;
+          font-size: 42px;
+          letter-spacing: 0.16em;
+          color: #e7c169;
+          margin-top: 18px;
+          opacity: 0;
+        }
+      </style>
+
+      <div id="root" data-composition-id="05-cierre-35" data-width="1920" data-height="1080">
+        <div class="vignette" data-layout-allow-overflow></div>
+        <div class="grain"></div>
+        <div class="glow" id="cl-glow" data-layout-allow-overflow></div>
+
+        <div class="lockup-wrap">
+          <img class="badge-35" id="cl-badge" src="assets/logo/badge-35-2x.png" />
+          <div class="divider" id="cl-divider"></div>
+          <img class="logo-mark" id="cl-logo" src="assets/logo/champal-logo.svg" />
+          <div class="headline-35" id="cl-headline">35 AÑOS</div>
+          <div class="subline-35" id="cl-subline">FORMANDO CAMPEONES</div>
+        </div>
+
+        <div class="curtain" id="cl-curtain"></div>
+      </div>
+
+      <script>
+        (function () {
+          window.__timelines = window.__timelines || {};
+          var tl = gsap.timeline({ paused: true });
+
+          // Elegant pause → reveal (crossfade up from the navy hold, not a blur-cut).
+          tl.fromTo(
+            "#cl-curtain",
+            { opacity: 1 },
+            { opacity: 0, duration: 0.55, ease: "power2.out" },
+            0,
+          );
+
+          // Badge-35 — spring-pop entrance (calm settle).
+          var BADGE_AT = 0.55,
+            BADGE_DUR = 0.5;
+          tl.fromTo(
+            "#cl-badge",
+            { scale: 0.85, opacity: 0 },
+            { scale: 1, opacity: 1, duration: BADGE_DUR, ease: "power3.out" },
+            BADGE_AT,
+          );
+
+          // Divider draws.
+          tl.fromTo(
+            "#cl-divider",
+            { scaleX: 0 },
+            { scaleX: 1, duration: 0.35, ease: "power3.out" },
+            BADGE_AT + BADGE_DUR - 0.15,
+          );
+
+          // Logotipo — spring-pop entrance, resolves the lockup (logo-assemble-lockup).
+          var LOGO_AT = BADGE_AT + BADGE_DUR + 0.05,
+            LOGO_DUR = 0.5;
+          tl.fromTo(
+            "#cl-logo",
+            { scale: 0.88, opacity: 0 },
+            { scale: 1, opacity: 1, duration: LOGO_DUR, ease: "power3.out" },
+            LOGO_AT,
+          );
+
+          // Ambient glow bloom behind the lockup, landing on the logo's settle.
+          var BLOOM_START = 0.35,
+            BLOOM_END = LOGO_AT + LOGO_DUR;
+          tl.fromTo(
+            "#cl-glow",
+            { opacity: 0, scale: 0.82 },
+            { opacity: 0.32, scale: 1, duration: BLOOM_END - BLOOM_START, ease: "power2.out" },
+            BLOOM_START,
+          );
+          var glow = document.getElementById("cl-glow");
+          var phase = { p: 0 };
+          var BREATHE_DUR = 4.6 - BLOOM_END;
+          tl.to(
+            phase,
+            {
+              p: Math.PI * 2 * (BREATHE_DUR / 2.9),
+              duration: BREATHE_DUR,
+              ease: "none",
+              onUpdate: function () {
+                var s = Math.sin(phase.p);
+                glow.style.opacity = String(0.32 + s * 0.04);
+                glow.style.transform = "translate(-50%, -50%) scale(" + (1 + s * 0.02) + ")";
+              },
+            },
+            BLOOM_END,
+          );
+
+          // Final message — waterfall-entry.
+          var H_AT = LOGO_AT + LOGO_DUR + 0.25;
+          tl.set("#cl-headline", { opacity: 1, y: 70 }, H_AT);
+          tl.to("#cl-headline", { y: 0, duration: 0.2, ease: "power4.out" }, H_AT);
+          var S_AT = H_AT + 0.2 - 1 / 60;
+          tl.set("#cl-subline", { opacity: 1, y: 40 }, S_AT);
+          tl.to("#cl-subline", { y: 0, duration: 0.16, ease: "power4.out" }, S_AT);
+
+          window.__timelines["05-cierre-35"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
