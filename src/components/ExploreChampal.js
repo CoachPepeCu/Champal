@@ -1,4 +1,11 @@
+"use client";
+
 import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
+
+import PreparatoriaConveniosUniversitarios from "@/components/PreparatoriaConveniosUniversitarios";
+import CircularCurtainOverlay from "@/components/effects/CircularCurtainOverlay";
 
 const CANVAS_W = 1440;
 const CANVAS_H = 760;
@@ -9,10 +16,10 @@ const cqw = (px) => `${((px / CANVAS_W) * 100).toFixed(4)}cqw`;
 const IMAGE_ROOT = "/images/conoce-champal";
 
 const ISLANDS = [
-  { name: "Campus", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300 },
-  { name: "Vida Champal", src: `${IMAGE_ROOT}/vida-champal.webp`, left: 96, top: 336, width: 300, height: 300 },
-  { name: "Convenios", src: `${IMAGE_ROOT}/convenios.webp`, left: 1025, top: 36, width: 300, height: 300 },
-  { name: "Certificaciones", src: `${IMAGE_ROOT}/certificaciones.webp`, left: 1025, top: 396, width: 300, height: 300 },
+  { name: "Campus", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300, enabled: false, float: { x: 1, y: 5, duration: 5.1, delay: 0 } },
+  { name: "Vida Champal", src: `${IMAGE_ROOT}/vida-champal.webp`, left: 96, top: 336, width: 300, height: 300, enabled: false, float: { x: -1.5, y: 7, duration: 5.8, delay: 0.8 } },
+  { name: "Convenios", src: `${IMAGE_ROOT}/convenios.webp`, left: 1025, top: 36, width: 300, height: 300, enabled: true, content: "university-agreements", float: { x: -1, y: 6, duration: 4.7, delay: 0.35 } },
+  { name: "Certificaciones", src: `${IMAGE_ROOT}/certificaciones.webp`, left: 1025, top: 396, width: 300, height: 300, enabled: false, float: { x: 1.5, y: 4, duration: 5.4, delay: 1.2 } },
   {
     name: "Actividades extracurriculares",
     src: `${IMAGE_ROOT}/actividades-extracurriculares.webp`,
@@ -20,6 +27,8 @@ const ISLANDS = [
     top: 472,
     width: 300,
     height: 300,
+    enabled: false,
+    float: { x: -2, y: 6, duration: 6, delay: 0.55 },
   },
 ];
 
@@ -91,7 +100,7 @@ function EducationalBackground() {
   );
 }
 
-function IslandButton({ island, desktop = false }) {
+function Island({ island, desktop = false, instanceId, isSectionVisible, reduceMotion, hidden, onActivate }) {
   const style = desktop
     ? {
         left: pctX(island.left),
@@ -101,25 +110,66 @@ function IslandButton({ island, desktop = false }) {
       }
     : undefined;
 
+  const Outer = island.enabled ? "button" : "div";
+
   return (
-    <button
-      type="button"
-      aria-label={island.name}
+    <Outer
+      {...(island.enabled
+        ? { type: "button", "aria-label": island.name, onClick: (event) => onActivate(island, event.currentTarget, instanceId) }
+        : {})}
       className={
         desktop
-          ? "absolute appearance-none border-0 bg-transparent p-0"
-          : "relative aspect-square w-full appearance-none border-0 bg-transparent p-0"
+          ? `absolute appearance-none border-0 bg-transparent p-0 ${island.enabled ? "cursor-pointer focus:outline-none" : ""}`
+          : `relative aspect-square w-full appearance-none border-0 bg-transparent p-0 ${island.enabled ? "cursor-pointer focus:outline-none" : ""}`
       }
       style={style}
     >
-      <Image
-        src={island.src}
-        alt=""
-        fill
-        sizes={desktop ? "21vw" : "46vw"}
-        className="pointer-events-none object-contain"
-      />
-    </button>
+      <motion.div
+        className="relative h-full w-full"
+        animate={
+          isSectionVisible && !reduceMotion
+            ? { x: [0, island.float.x, 0, -island.float.x, 0], y: [0, -island.float.y, 0, island.float.y, 0] }
+            : { x: 0, y: 0 }
+        }
+        transition={
+          isSectionVisible && !reduceMotion
+            ? { duration: island.float.duration, delay: island.float.delay, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 0.25 }
+        }
+      >
+        <motion.div
+          className="relative h-full w-full"
+          animate={{ opacity: hidden ? 0 : 1 }}
+          whileHover={
+            reduceMotion
+              ? { filter: "drop-shadow(0 10px 18px rgba(94, 200, 255, 0.85))" }
+              : {
+                  scale: 1.04,
+                  filter: [
+                    "drop-shadow(0 8px 16px rgba(77, 196, 255, 0.82))",
+                    "drop-shadow(0 11px 22px rgba(151, 91, 255, 0.96))",
+                    "drop-shadow(0 8px 18px rgba(65, 207, 255, 0.9))",
+                  ],
+                }
+          }
+          transition={{
+            scale: { duration: 0.275, ease: "easeOut" },
+            filter: reduceMotion
+              ? { duration: 0.2, ease: "easeOut" }
+              : { duration: 1.35, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
+            opacity: { duration: 0.275, ease: "easeOut" },
+          }}
+        >
+          <Image
+            src={island.src}
+            alt=""
+            fill
+            sizes={desktop ? "21vw" : "46vw"}
+            className="pointer-events-none object-contain"
+          />
+        </motion.div>
+      </motion.div>
+    </Outer>
   );
 }
 
@@ -149,8 +199,85 @@ function DesktopRoute({ route }) {
 }
 
 export default function ExploreChampal() {
+  const sectionRef = useRef(null);
+  const triggerRef = useRef(null);
+  const bodyLockRef = useRef(null);
+  const [phase, setPhase] = useState("idle");
+  const [flight, setFlight] = useState(null);
+  const [activeInstance, setActiveInstance] = useState(null);
+  const isSectionVisible = useInView(sectionRef, { amount: 0.05 });
+  const reduceMotion = useReducedMotion();
+
+  const restoreBody = useCallback(() => {
+    const lock = bodyLockRef.current;
+    if (!lock) return;
+
+    const body = document.body;
+    Object.assign(body.style, lock.styles);
+    window.scrollTo({ left: lock.scrollX, top: lock.scrollY, behavior: "instant" });
+    bodyLockRef.current = null;
+  }, []);
+
+  useEffect(() => () => restoreBody(), [restoreBody]);
+
+  const openIsland = useCallback((island, trigger, instanceId) => {
+    if (!island.enabled || phase !== "idle") return;
+
+    const rect = trigger.getBoundingClientRect();
+    const body = document.body;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+    const computedPaddingRight = Number.parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+
+    bodyLockRef.current = {
+      scrollX,
+      scrollY,
+      styles: {
+        overflow: body.style.overflow,
+        position: body.style.position,
+        top: body.style.top,
+        left: body.style.left,
+        width: body.style.width,
+        paddingRight: body.style.paddingRight,
+      },
+    };
+
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = `-${scrollX}px`;
+    body.style.width = "100%";
+    if (scrollbarWidth > 0) body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
+
+    triggerRef.current = trigger;
+    setActiveInstance(instanceId);
+    setFlight({
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+      src: island.src,
+      origin: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+    });
+    setPhase("flying");
+  }, [phase]);
+
+  const closeOverlay = useCallback(() => {
+    setPhase((current) => (current === "idle" || current === "closing" ? current : "closing"));
+  }, []);
+
+  const finishClose = useCallback(() => {
+    restoreBody();
+    setPhase("idle");
+    setFlight(null);
+    setActiveInstance(null);
+    requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
+  }, [restoreBody]);
+
   return (
     <section
+      ref={sectionRef}
       id="vida-estudiantil"
       data-section="conoce-champal"
       className="relative overflow-hidden"
@@ -184,7 +311,16 @@ export default function ExploreChampal() {
 
         <div className="absolute inset-0 z-20">
           {ISLANDS.map((island) => (
-            <IslandButton key={island.name} island={island} desktop />
+            <Island
+              key={island.name}
+              island={island}
+              desktop
+              instanceId={`desktop-${island.name}`}
+              isSectionVisible={isSectionVisible}
+              reduceMotion={reduceMotion}
+              hidden={activeInstance === `desktop-${island.name}`}
+              onActivate={openIsland}
+            />
           ))}
         </div>
       </div>
@@ -205,10 +341,33 @@ export default function ExploreChampal() {
 
         <div className="relative z-20 mt-4 grid grid-cols-2 gap-2 sm:gap-5">
           {ISLANDS.map((island) => (
-            <IslandButton key={island.name} island={island} />
+            <Island
+              key={island.name}
+              island={island}
+              instanceId={`mobile-${island.name}`}
+              isSectionVisible={isSectionVisible}
+              reduceMotion={reduceMotion}
+              hidden={activeInstance === `mobile-${island.name}`}
+              onActivate={openIsland}
+            />
           ))}
         </div>
       </div>
+
+      {phase !== "idle" && flight && (
+        <CircularCurtainOverlay
+          phase={phase}
+          origin={flight.origin}
+          flight={flight}
+          reduceMotion={reduceMotion}
+          onClose={closeOverlay}
+          onFlightComplete={() => setPhase((current) => (current === "flying" ? "revealing" : current))}
+          onOpened={() => setPhase((current) => (current === "revealing" ? "open" : current))}
+          onClosed={finishClose}
+        >
+          <PreparatoriaConveniosUniversitarios />
+        </CircularCurtainOverlay>
+      )}
     </section>
   );
 }

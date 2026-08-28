@@ -37,30 +37,41 @@ function HalconIcon({ className }) {
   );
 }
 
-export default function HalconButton({ targetId = "accesos", heroId = "top", label = "Regresar a Accesos" }) {
+export default function HalconButton({
+  targetId = "accesos",
+  heroId = "top",
+  label = "Regresar a Accesos",
+  ariaLabel,
+  onClick,
+  className = "",
+}) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (onClick) return undefined;
     const hero = document.getElementById(heroId);
     if (!hero) return undefined;
     const observer = new IntersectionObserver(([entry]) => setVisible(!entry.isIntersecting), { threshold: 0 });
     observer.observe(hero);
     return () => observer.disconnect();
-  }, [heroId]);
+  }, [heroId, onClick]);
+
+  const isVisible = onClick ? true : visible;
+  const MotionControl = onClick ? motion.button : motion.a;
 
   return (
     <AnimatePresence>
-      {visible && (
-        <motion.a
-          href={`#${targetId}`}
-          aria-label={label}
+      {isVisible && (
+        <MotionControl
+          {...(onClick ? { type: "button", onClick } : { href: `#${targetId}` })}
+          aria-label={ariaLabel ?? label}
           initial={{ opacity: 0, scale: 0.6, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.6, y: 20 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
-          className="group fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full"
+          className={`group fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full ${className}`}
         >
           {/* Anillos concéntricos — mismo tipo de pulso continuo que el
               "ping" del botón de WhatsApp (no una entrada de una sola
@@ -83,7 +94,7 @@ export default function HalconButton({ targetId = "accesos", heroId = "top", lab
             style={{ background: "linear-gradient(135deg, #6184b8 0%, #3d5476 100%)" }}
           />
           <HalconIcon className="relative h-9 w-9" />
-        </motion.a>
+        </MotionControl>
       )}
     </AnimatePresence>
   );
