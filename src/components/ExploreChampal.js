@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 
+import CertificacionesColaboraciones from "@/components/CertificacionesColaboraciones";
 import PreparatoriaConveniosUniversitarios from "@/components/PreparatoriaConveniosUniversitarios";
 import CircularCurtainOverlay from "@/components/effects/CircularCurtainOverlay";
 
@@ -16,18 +17,22 @@ const cqw = (px) => `${((px / CANVAS_W) * 100).toFixed(4)}cqw`;
 const IMAGE_ROOT = "/images/conoce-champal";
 
 const ISLANDS = [
-  { name: "Campus", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300, enabled: false, float: { x: 1, y: 5, duration: 5.1, delay: 0 } },
-  { name: "Vida Champal", src: `${IMAGE_ROOT}/vida-champal.webp`, left: 96, top: 336, width: 300, height: 300, enabled: false, float: { x: -1.5, y: 7, duration: 5.8, delay: 0.8 } },
-  { name: "Convenios", src: `${IMAGE_ROOT}/convenios.webp`, left: 1025, top: 36, width: 300, height: 300, enabled: true, content: "university-agreements", float: { x: -1, y: 6, duration: 4.7, delay: 0.35 } },
-  { name: "Certificaciones", src: `${IMAGE_ROOT}/certificaciones.webp`, left: 1025, top: 396, width: 300, height: 300, enabled: false, float: { x: 1.5, y: 4, duration: 5.4, delay: 1.2 } },
+  { id: "campus", name: "Campus", alt: "Campus de Colegio Champal", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300, enabled: false, component: null, ariaLabel: null, float: { x: 1, y: 5, duration: 5.1, delay: 0 } },
+  { id: "vida-champal", name: "Vida Champal", alt: "Vida estudiantil en Colegio Champal", src: `${IMAGE_ROOT}/vida-champal.webp`, left: 96, top: 336, width: 300, height: 300, enabled: false, component: null, ariaLabel: null, float: { x: -1.5, y: 7, duration: 5.8, delay: 0.8 } },
+  { id: "convenios", name: "Convenios", alt: "Convenios universitarios", src: `${IMAGE_ROOT}/convenios.webp`, left: 1025, top: 36, width: 300, height: 300, enabled: true, component: PreparatoriaConveniosUniversitarios, ariaLabel: "Conexión Universitaria", float: { x: -1, y: 6, duration: 4.7, delay: 0.35 } },
+  { id: "certificaciones", name: "Certificaciones", alt: "Certificaciones y colaboraciones", src: `${IMAGE_ROOT}/certificaciones.webp`, left: 1025, top: 396, width: 300, height: 300, enabled: true, component: CertificacionesColaboraciones, ariaLabel: "Certificaciones y colaboraciones", float: { x: 1.5, y: 4, duration: 5.4, delay: 1.2 } },
   {
+    id: "actividades-extracurriculares",
     name: "Actividades extracurriculares",
+    alt: "Actividades extracurriculares de Colegio Champal",
     src: `${IMAGE_ROOT}/actividades-extracurriculares.webp`,
     left: 571,
     top: 472,
     width: 300,
     height: 300,
     enabled: false,
+    component: null,
+    ariaLabel: null,
     float: { x: -2, y: 6, duration: 6, delay: 0.55 },
   },
 ];
@@ -162,7 +167,7 @@ function Island({ island, desktop = false, instanceId, isSectionVisible, reduceM
         >
           <Image
             src={island.src}
-            alt=""
+            alt={island.alt}
             fill
             sizes={desktop ? "21vw" : "46vw"}
             className="pointer-events-none object-contain"
@@ -204,9 +209,12 @@ export default function ExploreChampal() {
   const bodyLockRef = useRef(null);
   const [phase, setPhase] = useState("idle");
   const [flight, setFlight] = useState(null);
+  const [activeWorld, setActiveWorld] = useState(null);
   const [activeInstance, setActiveInstance] = useState(null);
   const isSectionVisible = useInView(sectionRef, { amount: 0.05 });
   const reduceMotion = useReducedMotion();
+  const activeWorldConfig = ISLANDS.find((island) => island.id === activeWorld);
+  const ActiveWorldContent = activeWorldConfig?.component;
 
   const restoreBody = useCallback(() => {
     const lock = bodyLockRef.current;
@@ -251,6 +259,7 @@ export default function ExploreChampal() {
     if (scrollbarWidth > 0) body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
 
     triggerRef.current = trigger;
+    setActiveWorld(island.id);
     setActiveInstance(instanceId);
     setFlight({
       left: rect.left,
@@ -264,13 +273,31 @@ export default function ExploreChampal() {
   }, [phase]);
 
   const closeOverlay = useCallback(() => {
-    setPhase((current) => (current === "idle" || current === "closing" ? current : "closing"));
+    setPhase((current) => {
+      if (current === "idle" || current === "closing") return current;
+
+      const trigger = triggerRef.current;
+      if (trigger?.isConnected) {
+        const rect = trigger.getBoundingClientRect();
+        setFlight((currentFlight) => currentFlight && ({
+          ...currentFlight,
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          height: rect.height,
+          origin: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+        }));
+      }
+
+      return "closing";
+    });
   }, []);
 
   const finishClose = useCallback(() => {
     restoreBody();
     setPhase("idle");
     setFlight(null);
+    setActiveWorld(null);
     setActiveInstance(null);
     requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
   }, [restoreBody]);
@@ -354,18 +381,19 @@ export default function ExploreChampal() {
         </div>
       </div>
 
-      {phase !== "idle" && flight && (
+      {phase !== "idle" && flight && activeWorldConfig && ActiveWorldContent && (
         <CircularCurtainOverlay
           phase={phase}
           origin={flight.origin}
           flight={flight}
           reduceMotion={reduceMotion}
+          ariaLabel={activeWorldConfig.ariaLabel}
           onClose={closeOverlay}
           onFlightComplete={() => setPhase((current) => (current === "flying" ? "revealing" : current))}
           onOpened={() => setPhase((current) => (current === "revealing" ? "open" : current))}
           onClosed={finishClose}
         >
-          <PreparatoriaConveniosUniversitarios />
+          <ActiveWorldContent />
         </CircularCurtainOverlay>
       )}
     </section>

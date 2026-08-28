@@ -16,6 +16,7 @@ export default function CircularCurtainOverlay({
   origin,
   flight,
   reduceMotion,
+  ariaLabel = "Conexión Universitaria",
   onClose,
   onFlightComplete,
   onOpened,
@@ -57,7 +58,7 @@ export default function CircularCurtainOverlay({
       ref={dialogRef}
       role="dialog"
       aria-modal="true"
-      aria-label="Conexión Universitaria"
+      aria-label={ariaLabel}
       tabIndex={-1}
       className="fixed inset-0 outline-none"
       style={{ zIndex: OVERLAY_Z_INDEX }}
