@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useReducedMotion } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 
 const W = 1440;
 const H = 760;
@@ -10,6 +10,11 @@ const BASE = "/images/conoce-champal/actividades-x";
 const xPct = (n) => `${((n / W) * 100).toFixed(6)}%`;
 const yPct = (n) => `${((n / H) * 100).toFixed(6)}%`;
 const cq = (n) => `${((n / W) * 100).toFixed(6)}cqw`;
+const EASE_OUT = [0.22, 1, 0.36, 1];
+
+// Orden irregular, pero estable entre SSR e hidratacion. Visualmente evita
+// que las tarjetas aparezcan por filas o en un stagger demasiado mecanico.
+const CARD_REVEAL_DELAYS = [0.91, 1.18, 0.82, 1.31, 1.02, 1.42, 1.11, 0.76, 1.25, 0.96, 1.36, 0.86];
 
 export const activities = [
   { id: "club-rayados", title: "CLUB RAYADOS", description: "Recibimos a niños y jóvenes que desean aprender el fútbol.", image: "club-rayados-rgba.webp", imageAlt: "Ilustración de jugador de Club Rayados", headerColor: "#1e385b", left: 760, top: 109, grayTop: 16, titleTop: 5, titleWidth: 104, frontVariant: "tae", imageWidth: 111, imageHeight: 141, imageLeft: 12, imageTop: 33 },
@@ -45,7 +50,7 @@ function FrontCard({ activity }) {
   );
 }
 
-function ActivityCard({ activity, touchOpen, onTouchToggle, onRevealMeasured, reduceMotion }) {
+function ActivityCard({ activity, index, visible, touchOpen, onTouchToggle, onRevealMeasured, reduceMotion }) {
   const descriptionRef = useRef(null);
   const descriptionTextRef = useRef(null);
   const focusFrameRef = useRef(null);
@@ -102,9 +107,16 @@ function ActivityCard({ activity, touchOpen, onTouchToggle, onRevealMeasured, re
     "--interaction-duration": reduceMotion ? "0.01ms" : "340ms",
   };
   return (
-    <article
+    <motion.article
       className="activityCard ax-activity"
       style={style}
+      initial={false}
+      animate={{ opacity: visible ? 1 : 0 }}
+      transition={{
+        duration: reduceMotion ? 0 : 0.52,
+        delay: reduceMotion ? 0 : CARD_REVEAL_DELAYS[index],
+        ease: EASE_OUT,
+      }}
       data-activity-id={activity.id}
       data-active={active ? "true" : "false"}
       role="button"
@@ -146,12 +158,15 @@ function ActivityCard({ activity, touchOpen, onTouchToggle, onRevealMeasured, re
         </div>
       </div>
       <FrontCard activity={activity} />
-    </article>
+    </motion.article>
   );
 }
 
 export default function ActividadesExtracurriculares() {
+  const sectionRef = useRef(null);
   const reduceMotion = useReducedMotion();
+  const isInView = useInView(sectionRef, { once: true, amount: 0.12 });
+  const visible = isInView || reduceMotion;
   const measurementsRef = useRef(new Map());
   const [touchOpenId, setTouchOpenId] = useState(null);
   const [firstRowReveal, setFirstRowReveal] = useState(0);
@@ -186,18 +201,32 @@ export default function ActividadesExtracurriculares() {
   }, [updateFirstRowReveal]);
 
   return (
-    <section className="actividades-x" aria-labelledby="actividades-x-title">
+    <section ref={sectionRef} className="actividades-x" aria-labelledby="actividades-x-title">
       <div className="ax-stage">
         <Image src={`${BASE}/fondo-nebula.webp`} alt="" fill priority sizes="(min-width: 1440px) 1440px, 100vw" className="ax-background" />
         <Image src={`${BASE}/olas-inferiores.svg`} alt="" width={1440} height={295} className="ax-waves" />
         <header className="ax-header">
-          <div className="ax-eyebrow"><span /><p>Actividades extracurriculares</p></div>
-          <h1 id="actividades-x-title">Más allá del aula, cada interés encuentra un espacio para crecer.</h1>
+          <motion.div
+            className="ax-eyebrow"
+            initial={false}
+            animate={{ opacity: visible ? 1 : 0, x: visible ? 0 : -90 }}
+            transition={{ duration: reduceMotion ? 0 : 0.62, delay: reduceMotion ? 0 : 0.18, ease: EASE_OUT }}
+          ><span /><p>Actividades extracurriculares</p></motion.div>
+          <motion.div
+            className="ax-title-reveal"
+            initial={false}
+            animate={{ clipPath: visible ? "inset(0% 0% 0% 0%)" : "inset(0% 0% 100% 0%)" }}
+            transition={{ duration: reduceMotion ? 0 : 0.72, delay: reduceMotion ? 0 : 0.4, ease: EASE_OUT }}
+          >
+            <h1 id="actividades-x-title">Más allá del aula, cada interés encuentra un espacio para crecer.</h1>
+          </motion.div>
         </header>
         <div className="ax-cards" style={{ "--first-row-reveal": `${firstRowReveal}px` }}>
-          {activities.map((activity) => <ActivityCard
+          {activities.map((activity, index) => <ActivityCard
             key={activity.id}
             activity={activity}
+            index={index}
+            visible={visible}
             touchOpen={touchOpenId === activity.id}
             onTouchToggle={(activityId) => setTouchOpenId((current) => current === activityId ? null : activityId)}
             onRevealMeasured={handleRevealMeasured}
@@ -211,7 +240,7 @@ export default function ActividadesExtracurriculares() {
         .ax-background{z-index:-2;object-fit:cover}.ax-waves{position:absolute;z-index:-1;bottom:0;left:-35%;width:170%;height:24%;object-fit:fill;pointer-events:none}
         .ax-header{position:relative;z-index:3;max-width:560px;margin:0 auto 36px}.ax-eyebrow{display:flex;align-items:center;gap:12px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
         .ax-eyebrow span{flex:0 0 40px;height:6px;background:#aa181f}.ax-eyebrow p{margin:0;font-family:var(--font-outfit),sans-serif;font-size:12px;line-height:18px;letter-spacing:.012em}
-        .ax-header h1{margin:12px 0 0;font-family:var(--font-fredoka),sans-serif;font-size:clamp(34px,10vw,46px);font-weight:500;line-height:1.09;text-shadow:0 4px 4px rgba(0,0,0,.25),0 4px 4px rgba(0,0,0,.25)}
+        .ax-title-reveal{margin-top:12px;overflow:hidden}.ax-header h1{margin:0;font-family:var(--font-fredoka),sans-serif;font-size:clamp(34px,10vw,46px);font-weight:500;line-height:1.09;text-shadow:0 4px 4px rgba(0,0,0,.25),0 4px 4px rgba(0,0,0,.25)}
         .ax-cards{position:relative;display:grid;grid-template-columns:150px;justify-content:center;justify-items:center;column-gap:16px;row-gap:24px;padding-top:max(0px,calc(var(--first-row-reveal,0px) - 36px))}
         .ax-activity{position:relative;width:150px;height:250px;overflow:visible;z-index:0;outline:none}.ax-activity[data-active="true"]{z-index:20}.ax-description,.ax-front{position:absolute;top:0;left:0;width:150px;will-change:transform;transition-duration:var(--interaction-duration);transition-timing-function:cubic-bezier(.22,1,.36,1)}
         .ax-description{z-index:1;min-height:150px;padding:0;border:2px solid #fdc119;border-radius:10px;color:#000;text-align:center;font-size:11px;line-height:1.2;letter-spacing:.04em;overflow:hidden;transform:translateY(0);transition-property:transform}.ax-description-panel{min-height:92px;margin:36px 8px 8px;padding:12px 4px 10px;border-radius:9px;background:#fff}.ax-description p{margin:0}.ax-activity[data-active="true"] .ax-description{transform:translateY(calc(0px - var(--description-reveal)))}
@@ -225,7 +254,7 @@ export default function ActividadesExtracurriculares() {
         @media(min-width:1024px){
           .ax-stage{width:100%;max-width:1440px;min-height:0;aspect-ratio:1440/760;padding:0}.ax-background{object-fit:fill}.ax-waves{top:62.105263%;bottom:auto;left:0;width:100%;height:38.815789%}
           .ax-header{position:absolute;top:13.947368%;left:10.486111%;width:36.25%;max-width:none;margin:0}.ax-eyebrow{gap:.972222cqw}.ax-eyebrow span{flex-basis:3.888889cqw;height:.416667cqw}.ax-eyebrow p{font-size:1.041667cqw;line-height:1.25cqw}
-          .ax-header h1{margin-top:.694444cqw;font-size:3.194444cqw;line-height:3.472222cqw}.ax-cards{position:absolute;inset:0;display:block;padding-top:0}
+          .ax-title-reveal{margin-top:.694444cqw}.ax-header h1{font-size:3.194444cqw;line-height:3.472222cqw}.ax-cards{position:absolute;inset:0;display:block;padding-top:0}
           .ax-activity{position:absolute;top:var(--card-top);left:var(--card-left);width:10.416667cqw;height:12.777778cqw}.ax-description,.ax-front{width:10.416667cqw}
           .ax-description{min-height:10.416667cqw;border-width:.138889cqw;border-radius:.694444cqw;font-size:.763889cqw}.ax-description-panel{min-height:6.388889cqw;margin:2.5cqw .555556cqw .555556cqw;padding:.833333cqw .277778cqw .694444cqw;border-radius:.625cqw}.ax-front{height:10.416667cqw}
           .ax-card-title{top:var(--title-top);width:var(--title-width);font-size:.972222cqw;line-height:.972222cqw;letter-spacing:.097222cqw}.ax-gray-layer{top:var(--gray-top);left:-.138889cqw;width:10.416667cqw;height:9.375cqw}.ax-gray-shape{top:.311667cqw;width:10.416667cqw;height:9.063333cqw}

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 
+import ActividadesExtracurriculares from "@/components/ActividadesExtracurriculares";
 import CertificacionesColaboraciones from "@/components/CertificacionesColaboraciones";
 import PreparatoriaConveniosUniversitarios from "@/components/PreparatoriaConveniosUniversitarios";
 import CircularCurtainOverlay from "@/components/effects/CircularCurtainOverlay";
@@ -17,10 +18,10 @@ const cqw = (px) => `${((px / CANVAS_W) * 100).toFixed(4)}cqw`;
 const IMAGE_ROOT = "/images/conoce-champal";
 
 const ISLANDS = [
-  { id: "campus", name: "Campus", alt: "Campus de Colegio Champal", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300, enabled: false, component: null, ariaLabel: null, float: { x: 1, y: 5, duration: 5.1, delay: 0 } },
-  { id: "vida-champal", name: "Vida Champal", alt: "Vida estudiantil en Colegio Champal", src: `${IMAGE_ROOT}/vida-champal.webp`, left: 96, top: 336, width: 300, height: 300, enabled: false, component: null, ariaLabel: null, float: { x: -1.5, y: 7, duration: 5.8, delay: 0.8 } },
-  { id: "convenios", name: "Convenios", alt: "Convenios universitarios", src: `${IMAGE_ROOT}/convenios.webp`, left: 1025, top: 36, width: 300, height: 300, enabled: true, component: PreparatoriaConveniosUniversitarios, ariaLabel: "Conexión Universitaria", float: { x: -1, y: 6, duration: 4.7, delay: 0.35 } },
-  { id: "certificaciones", name: "Certificaciones", alt: "Certificaciones y colaboraciones", src: `${IMAGE_ROOT}/certificaciones.webp`, left: 1025, top: 396, width: 300, height: 300, enabled: true, component: CertificacionesColaboraciones, ariaLabel: "Certificaciones y colaboraciones", float: { x: 1.5, y: 4, duration: 5.4, delay: 1.2 } },
+  { id: "campus", name: "Campus", alt: "Campus de Colegio Champal", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300, enabled: false, component: null, ariaLabel: null, hoverLabel: { text: "Nuestro Cole", left: -6, top: 283 }, float: { x: 1, y: 5, duration: 5.1, delay: 0 } },
+  { id: "vida-champal", name: "Vida Champal", alt: "Vida estudiantil en Colegio Champal", src: `${IMAGE_ROOT}/vida-champal.webp`, left: 96, top: 336, width: 300, height: 300, enabled: false, component: null, ariaLabel: null, hoverLabel: { text: "Comunidad Champal", left: -6, top: 307 }, float: { x: -1.5, y: 7, duration: 5.8, delay: 0.8 } },
+  { id: "convenios", name: "Convenios", alt: "Convenios universitarios", src: `${IMAGE_ROOT}/convenios.webp`, left: 1025, top: 36, width: 300, height: 300, enabled: true, component: PreparatoriaConveniosUniversitarios, ariaLabel: "Conexión Universitaria", hoverLabel: { text: "Conexión Universitaria", left: -3, top: 284 }, float: { x: -1, y: 6, duration: 4.7, delay: 0.35 } },
+  { id: "certificaciones", name: "Certificaciones", alt: "Certificaciones y colaboraciones", src: `${IMAGE_ROOT}/certificaciones.webp`, left: 1025, top: 396, width: 300, height: 300, enabled: true, component: CertificacionesColaboraciones, ariaLabel: "Certificaciones y colaboraciones", hoverLabel: { text: "Certificaciones y Convenios", left: 7, top: 267 }, float: { x: 1.5, y: 4, duration: 5.4, delay: 1.2 } },
   {
     id: "actividades-extracurriculares",
     name: "Actividades extracurriculares",
@@ -30,9 +31,10 @@ const ISLANDS = [
     top: 472,
     width: 300,
     height: 300,
-    enabled: false,
-    component: null,
-    ariaLabel: null,
+    enabled: true,
+    component: ActividadesExtracurriculares,
+    ariaLabel: "Actividades extracurriculares",
+    hoverLabel: { text: "Clases extracurriculares", left: -7, top: -33 },
     float: { x: -2, y: 6, duration: 6, delay: 0.55 },
   },
 ];
@@ -106,6 +108,7 @@ function EducationalBackground() {
 }
 
 function Island({ island, desktop = false, instanceId, isSectionVisible, reduceMotion, hidden, onActivate }) {
+  const visualRef = useRef(null);
   const style = desktop
     ? {
         left: pctX(island.left),
@@ -120,24 +123,29 @@ function Island({ island, desktop = false, instanceId, isSectionVisible, reduceM
   return (
     <Outer
       {...(island.enabled
-        ? { type: "button", "aria-label": island.name, onClick: (event) => onActivate(island, event.currentTarget, instanceId) }
+        ? {
+            type: "button",
+            "aria-label": island.name,
+            onClick: (event) => onActivate(island, event.currentTarget, visualRef.current, instanceId),
+          }
         : {})}
       className={
         desktop
-          ? `absolute appearance-none border-0 bg-transparent p-0 ${island.enabled ? "cursor-pointer focus:outline-none" : ""}`
-          : `relative aspect-square w-full appearance-none border-0 bg-transparent p-0 ${island.enabled ? "cursor-pointer focus:outline-none" : ""}`
+          ? `group absolute appearance-none border-0 bg-transparent p-0 ${island.enabled ? "cursor-pointer focus:outline-none" : ""}`
+          : `group relative aspect-square w-full appearance-none border-0 bg-transparent p-0 ${island.enabled ? "cursor-pointer focus:outline-none" : ""}`
       }
       style={style}
     >
       <motion.div
+        ref={visualRef}
         className="relative h-full w-full"
         animate={
-          isSectionVisible && !reduceMotion
+          isSectionVisible && !reduceMotion && !hidden
             ? { x: [0, island.float.x, 0, -island.float.x, 0], y: [0, -island.float.y, 0, island.float.y, 0] }
             : { x: 0, y: 0 }
         }
         transition={
-          isSectionVisible && !reduceMotion
+          isSectionVisible && !reduceMotion && !hidden
             ? { duration: island.float.duration, delay: island.float.delay, repeat: Infinity, ease: "easeInOut" }
             : { duration: 0.25 }
         }
@@ -173,6 +181,32 @@ function Island({ island, desktop = false, instanceId, isSectionVisible, reduceM
             className="pointer-events-none object-contain"
           />
         </motion.div>
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute z-10 flex items-center justify-center whitespace-nowrap border-2 border-white bg-white/20 px-3 text-center font-semibold text-white opacity-0 shadow-[0_4px_4px_rgba(0,0,0,0.25)] group-hover:opacity-100 group-focus-visible:opacity-100 ${reduceMotion ? "" : "transition-opacity duration-200"}`}
+          style={desktop
+            ? {
+                left: cqw(island.hoverLabel.left),
+                top: cqw(island.hoverLabel.top),
+                width: cqw(312),
+                height: cqw(40),
+                borderRadius: cqw(18),
+                fontSize: cqw(22),
+                lineHeight: "normal",
+              }
+            : {
+                left: "50%",
+                bottom: 0,
+                width: "calc(100% + 12px)",
+                minHeight: 32,
+                borderRadius: 16,
+                fontSize: "clamp(12px, 3.4vw, 16px)",
+                lineHeight: 1.1,
+                transform: "translateX(-50%)",
+              }}
+        >
+          {island.hoverLabel.text}
+        </div>
       </motion.div>
     </Outer>
   );
@@ -206,6 +240,7 @@ function DesktopRoute({ route }) {
 export default function ExploreChampal() {
   const sectionRef = useRef(null);
   const triggerRef = useRef(null);
+  const geometryRef = useRef(null);
   const bodyLockRef = useRef(null);
   const [phase, setPhase] = useState("idle");
   const [flight, setFlight] = useState(null);
@@ -228,10 +263,12 @@ export default function ExploreChampal() {
 
   useEffect(() => () => restoreBody(), [restoreBody]);
 
-  const openIsland = useCallback((island, trigger, instanceId) => {
-    if (!island.enabled || phase !== "idle") return;
+  const openIsland = useCallback((island, trigger, visual, instanceId) => {
+    if (!island.enabled || phase !== "idle" || !visual?.isConnected) return;
+    const visualImage = visual.querySelector("img");
+    if (!visualImage?.complete || visualImage.naturalWidth === 0) return;
 
-    const rect = trigger.getBoundingClientRect();
+    const rect = visual.getBoundingClientRect();
     const body = document.body;
     const scrollX = window.scrollX;
     const scrollY = window.scrollY;
@@ -259,6 +296,7 @@ export default function ExploreChampal() {
     if (scrollbarWidth > 0) body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
 
     triggerRef.current = trigger;
+    geometryRef.current = visual;
     setActiveWorld(island.id);
     setActiveInstance(instanceId);
     setFlight({
@@ -276,9 +314,9 @@ export default function ExploreChampal() {
     setPhase((current) => {
       if (current === "idle" || current === "closing") return current;
 
-      const trigger = triggerRef.current;
-      if (trigger?.isConnected) {
-        const rect = trigger.getBoundingClientRect();
+      const visual = geometryRef.current;
+      if (visual?.isConnected) {
+        const rect = visual.getBoundingClientRect();
         setFlight((currentFlight) => currentFlight && ({
           ...currentFlight,
           left: rect.left,
@@ -299,7 +337,11 @@ export default function ExploreChampal() {
     setFlight(null);
     setActiveWorld(null);
     setActiveInstance(null);
-    requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
+    geometryRef.current = null;
+    requestAnimationFrame(() => {
+      triggerRef.current?.focus({ preventScroll: true });
+      triggerRef.current = null;
+    });
   }, [restoreBody]);
 
   return (
