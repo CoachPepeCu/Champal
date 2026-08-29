@@ -1,32 +1,25 @@
 import Image from "next/image";
+import Link from "next/link";
 
-// Enlaces exactos del diseño de Figma (node 82:777) — "Modelo educativo" no
-// tiene una sección propia todavía, así que apunta a Niveles como el
-// contenido más cercano; confirmar con el usuario si conviene crear una
-// sección dedicada más adelante.
 const COLUMNS = [
   {
     title: "Conoce Champal",
     widthClass: "lg:w-[180px]",
     links: [
-      { label: "Colegio", href: "/#nosotros" },
-      { label: "Modelo educativo", href: "/#niveles-educativos" },
-      { label: "Explora Champal", href: "/#vida-estudiantil" },
-      { label: "Admisiones", href: "/#admisiones" },
+      { label: "Acerca del Colegio" },
+      { label: "Comunidad" },
     ],
   },
   {
     title: "Niveles académicos",
     widthClass: "lg:w-[230px]",
-    // Mismos destinos que el submenú "Niveles" del header: la ruta propia
-    // si ya existe (Pre-Kinder), el ancla de la home si aún no.
     links: [
       { label: "Pre-Kinder", href: "/niveles/pre-kinder" },
       { label: "Kinder", href: "/niveles/kinder" },
       { label: "Primaria", href: "/niveles/primaria" },
       { label: "Secundaria", href: "/niveles/secundaria" },
       { label: "Preparatoria", href: "/niveles/preparatoria" },
-      { label: "International High School", href: "/#international-high-school" },
+      { label: "International High School", href: "/niveles/preparatoria#international-high-school" },
     ],
   },
 ];
@@ -58,8 +51,8 @@ export default function Footer() {
         <div className="absolute inset-0" style={{ backgroundImage: OVERLAY_ARRIBA }} />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8 pt-14 pb-14">
-        <div className="flex flex-col gap-12 lg:flex-row lg:gap-16">
+      <div className="relative mx-auto w-full max-w-[1920px] px-6 pt-14 pb-14 lg:px-8 xl:px-12 2xl:px-16">
+        <div className="flex flex-col gap-12 lg:flex-row lg:justify-between lg:gap-16">
           {/* Col_Identidad */}
           <div className="flex shrink-0 flex-col items-center gap-3">
             <Image
@@ -88,12 +81,16 @@ export default function Footer() {
               <ul className="flex flex-col gap-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm leading-[22px] text-white/[0.86] transition-colors duration-200 hover:text-white"
-                    >
-                      {link.label}
-                    </a>
+                    {link.href ? (
+                      <Link
+                        href={link.href}
+                        className="inline-block cursor-pointer rounded-sm text-sm leading-[22px] text-white/[0.86] transition-[color,transform] duration-200 hover:text-white motion-safe:hover:translate-x-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white motion-reduce:transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <span className="text-sm leading-[22px] text-white/[0.86]">{link.label}</span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -116,19 +113,19 @@ export default function Footer() {
               Tabasco, C.P. 86153
             </p>
             <div className="text-[15px] font-medium leading-[22px] text-white/[0.86]">
-              <a href="tel:+19933515478" className="block transition-colors duration-200 hover:text-white">
+              <a href="tel:+19933515478" className="block rounded-sm transition-colors duration-200 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
                 (993) 351 5478
               </a>
-              <a href="tel:+19933516869" className="block transition-colors duration-200 hover:text-white">
+              <a href="tel:+19933516869" className="block rounded-sm transition-colors duration-200 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
                 (993) 351 6869
               </a>
-              <a href="tel:+19933513250" className="block transition-colors duration-200 hover:text-white">
+              <a href="tel:+19933513250" className="block rounded-sm transition-colors duration-200 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
                 (993) 351 3250
               </a>
             </div>
             <a
               href="mailto:contacto@colegiochampal.edu.mx"
-              className="text-sm font-medium text-white transition-colors duration-200 hover:text-white/80"
+              className="rounded-sm text-sm font-medium text-white transition-colors duration-200 hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
               contacto@colegiochampal.edu.mx
             </a>
@@ -140,7 +137,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="flex h-[42px] w-[42px] items-center justify-center rounded-full transition-colors duration-200 hover:bg-white/25"
+                  className="flex h-[42px] w-[42px] items-center justify-center rounded-full transition-[background-color,transform] duration-200 hover:bg-white/35 motion-safe:hover:-translate-y-0.5 motion-safe:hover:scale-[1.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white motion-reduce:transition-colors"
                   style={{ backgroundColor: "rgba(255,255,255,0.14)", border: "1.5px solid rgba(255,255,255,0.9)" }}
                 >
                   <Image src={s.icon} alt="" width={s.width} height={s.height} />
@@ -154,7 +151,7 @@ export default function Footer() {
 
         <div className="mt-6 flex flex-col items-center gap-3 text-xs text-white/[0.76] sm:flex-row sm:justify-between">
           <p>© 2026 Colegio Champal. Todos los derechos reservados.</p>
-          <a href="#" className="transition-colors duration-200 hover:text-white">
+          <a href="#" className="rounded-sm transition-colors duration-200 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
             Aviso de privacidad
           </a>
         </div>

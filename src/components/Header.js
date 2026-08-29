@@ -330,7 +330,7 @@ export default function Header() {
           }}
         />
 
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="relative w-full px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="flex h-[88px] items-center justify-between">
             <a href="/#top" className="group flex items-center shrink-0">
               <Image
