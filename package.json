@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "campus:manifest": "node scripts/generate-campus-manifest.mjs",
+    "predev": "npm run campus:manifest",
     "dev": "next dev",
+    "prebuild": "npm run campus:manifest",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
