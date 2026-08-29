@@ -200,7 +200,7 @@ export default function CampusInteractivo() {
           animate={{ opacity: 1 }}
           transition={{ duration: reduceMotion ? 0 : 0.72, ease: EASE_OUT }}
         >
-          <Image src={`${ASSET_ROOT}/background.png`} alt="" fill priority sizes="100vw" className="campus-background-image" />
+          <Image src={`${ASSET_ROOT}/background.webp`} alt="" fill priority sizes="100vw" className="campus-background-image" />
         </motion.div>
 
         <div className="campus-curve" aria-hidden="true">
@@ -336,7 +336,7 @@ export default function CampusInteractivo() {
         .campus-eyebrow{display:flex;align-items:center;gap:4px;height:18px;font-family:var(--font-outfit),sans-serif}.campus-eyebrow span{width:40px;height:6px;flex:none;background:#aa181f}.campus-eyebrow p{margin:0;font-size:15px;font-weight:600;line-height:18px;letter-spacing:.18px}
         .campus-title-reveal{overflow:hidden}.campus-copy h1{margin:15px 0 0;font-family:var(--font-fredoka),sans-serif;font-size:40px;font-weight:500;line-height:1.2;text-shadow:0 4px 4px rgba(0,0,0,.25)}.campus-copy h1 span{font-size:48px}
         .campus-viewer{position:absolute;z-index:10;left:18.75%;top:35.9211%;width:62.5%;height:59.2105%;box-sizing:border-box;border:8px solid #fff;background:#c7c7c7;box-shadow:0 4px 12px rgba(0,35,79,.2);opacity:0;pointer-events:none;transition:opacity ${PHOTO_DURATION}ms cubic-bezier(.22,1,.36,1)}.campus-viewer.is-visible{opacity:1;pointer-events:auto}
-        .campus-photo-stage,.campus-photo{position:absolute;inset:0}.campus-photo{object-fit:cover}.campus-photo.is-current{opacity:1}.campus-photo.is-incoming{opacity:0;transition:opacity var(--photo-duration) cubic-bezier(.22,1,.36,1)}.campus-photo.is-incoming.is-visible{opacity:1}
+        .campus-photo-stage,.campus-photo{position:absolute;inset:0}.campus-photo{object-fit:contain}.campus-photo.is-current{opacity:1}.campus-photo.is-incoming{opacity:0;transition:opacity var(--photo-duration) cubic-bezier(.22,1,.36,1)}.campus-photo.is-incoming.is-visible{opacity:1}
         .campus-photo-controls{position:absolute;z-index:12;left:43.9583%;top:89.4737%;width:11.3889%;height:8.6842%;display:flex;align-items:center;justify-content:center;gap:14px;border:1px solid #003bff;border-radius:12px;background:rgba(5,123,134,.2);box-shadow:0 4px 4px rgba(0,0,0,.25)}
         .campus-photo-control{position:relative;width:45px;height:45px;flex:0 0 45px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;transition:transform 200ms ease,filter 200ms ease}.campus-photo-control:last-child img{transform:rotate(180deg)}.campus-photo-control:hover:not(:disabled){transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(99,214,255,.9))}.campus-photo-control:disabled{cursor:default}
         @media(max-width:1023px){.campus-stage{width:100%;height:auto;aspect-ratio:1440/760}.campus-group-control{width:44px;height:44px}.campus-copy h1{font-size:3.4cqw}.campus-copy h1 span{font-size:4cqw}.campus-eyebrow p{font-size:1.25cqw}.campus-eyebrow span{width:3.4cqw;height:.5cqw}}

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 
 import ActividadesExtracurriculares from "@/components/ActividadesExtracurriculares";
+import CampusInteractivo from "@/components/CampusInteractivo";
 import CertificacionesColaboraciones from "@/components/CertificacionesColaboraciones";
 import PreparatoriaConveniosUniversitarios from "@/components/PreparatoriaConveniosUniversitarios";
 import VidaEstudiantil from "@/components/VidaEstudiantil";
@@ -19,7 +20,7 @@ const cqw = (px) => `${((px / CANVAS_W) * 100).toFixed(4)}cqw`;
 const IMAGE_ROOT = "/images/conoce-champal";
 
 const ISLANDS = [
-  { id: "campus", name: "Campus", alt: "Campus de Colegio Champal", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300, enabled: false, component: null, ariaLabel: null, hoverLabel: { text: "Nuestro Cole", left: -6, top: 283 }, float: { x: 1, y: 5, duration: 5.1, delay: 0 } },
+  { id: "campus", name: "Campus", alt: "Campus de Colegio Champal", src: `${IMAGE_ROOT}/campus-exterior.webp`, left: 96, top: 17, width: 300, height: 300, enabled: true, component: CampusInteractivo, ariaLabel: "Campus Champal", hoverLabel: { text: "Nuestro Cole", left: -6, top: 283 }, float: { x: 1, y: 5, duration: 5.1, delay: 0 } },
   { id: "vida-champal", name: "Vida Champal", alt: "Vida estudiantil en Colegio Champal", src: `${IMAGE_ROOT}/vida-champal.webp`, left: 96, top: 336, width: 300, height: 300, enabled: true, component: VidaEstudiantil, ariaLabel: "Vida estudiantil", hoverLabel: { text: "Comunidad Champal", left: -6, top: 307 }, float: { x: -1.5, y: 7, duration: 5.8, delay: 0.8 } },
   { id: "convenios", name: "Convenios", alt: "Convenios universitarios", src: `${IMAGE_ROOT}/convenios.webp`, left: 1025, top: 36, width: 300, height: 300, enabled: true, component: PreparatoriaConveniosUniversitarios, ariaLabel: "Conexión Universitaria", hoverLabel: { text: "Conexión Universitaria", left: -3, top: 284 }, float: { x: -1, y: 6, duration: 4.7, delay: 0.35 } },
   { id: "certificaciones", name: "Certificaciones", alt: "Certificaciones y colaboraciones", src: `${IMAGE_ROOT}/certificaciones.webp`, left: 1025, top: 396, width: 300, height: 300, enabled: true, component: CertificacionesColaboraciones, ariaLabel: "Certificaciones y colaboraciones", hoverLabel: { text: "Certificaciones y Convenios", left: 7, top: 267 }, float: { x: 1.5, y: 4, duration: 5.4, delay: 1.2 } },
