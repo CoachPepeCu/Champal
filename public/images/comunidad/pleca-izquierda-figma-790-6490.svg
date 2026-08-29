@@ -1,0 +1,21 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="651.458" height="772" viewBox="0 0 651.458 772" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Pleca Izquierda" filter="url(#filter0_d_0_4)">
+<path d="M4 1H522.5C522.5 1 626 197 405 352.5C365.333 380.41 381.082 459.557 457 522.5C524.389 578.372 634.5 591.5 643 648.5C652.768 714 503 761 503 761H4V1Z" fill="url(#paint0_linear_0_4)"/>
+</g>
+<defs>
+<filter id="filter0_d_0_4" x="0" y="0" width="651.458" height="772" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="2" dy="5"/>
+<feGaussianBlur stdDeviation="3"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_4"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_4" result="shape"/>
+</filter>
+<linearGradient id="paint0_linear_0_4" x1="47.5" y1="1.00001" x2="380" y2="761" gradientUnits="userSpaceOnUse">
+<stop stop-color="#E3E3E3"/>
+<stop offset="1" stop-color="#E3E3E3"/>
+</linearGradient>
+</defs>
+</svg>
