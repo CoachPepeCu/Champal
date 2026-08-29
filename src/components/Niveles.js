@@ -21,15 +21,10 @@ const SECTION_GRADIENT =
 // (van por encima de la placa, no forman parte de ella).
 const PANEL_SHIFT = 18;
 
-// "Pleca_Izquierda" (blob claro detrás de las 5 tarjetas, 520.5x711.5) se
-// exporta vacío desde Figma (capa sin relleno resuelto, mismo problema que
-// tuvo Comunidad.js con su propia pleca). Sin un export corregido a mano,
-// se aproxima el contorno con un path dibujado sobre la captura de pantalla
-// del nodo: esquina superior a escuadra, barrido circular grande hacia
-// abajo-izquierda, termina en punta cerca de (0, 710). Color muestreado del
-// screenshot (#e3e3e3), igual en ambos breakpoints.
+// Geometría vectorial nativa de Figma: "Izquierda" (node 1077:1051),
+// 497x772 dentro del frame 1440x772. Una sola superficie, sin trazo.
 const PLECA_IZQUIERDA_PATH =
-  "M0 0 L480 0 Q520 0 520 40 C520 220 480 380 380 460 C220 590 120 610 40 650 C20 670 8 690 0 710 Z";
+  "M 0 0 L 497 0 C 497 0 252.09650897979736 106.44253540039062 237.50010681152344 222.5049285888672 C 221.50010681152344 349.7279357910156 462.45928955078125 389.3374328613281 420.50018310546875 439.05474853515625 C 394.0002746582031 470.45446968078613 232.0001678466797 512.1402816772461 137.50001525878906 603.632568359375 C 9.964698791503906 727.1085510253906 0.0000742295160307549 772.0000610351562 0.0000742295160307549 772.0000610351562 L 0 0 Z";
 
 // Card local (250x250) — tamaño real de cada "Cuadro_*" en el export.
 const CARD = 250;
@@ -264,11 +259,11 @@ export default function Niveles() {
     <section className="relative overflow-hidden" style={{ backgroundImage: SECTION_GRADIENT }}>
       {/* ---------- Desktop (>=lg): réplica exacta del canvas 1440x772 ---------- */}
       <div className="relative hidden aspect-[1440/772] w-full lg:block" style={{ containerType: "inline-size" }}>
-        {/* Pleca_Izquierda — aproximación (ver comentario arriba), color plano #e3e3e3 */}
+        {/* Pleca_Izquierda — vector exacto de Figma, color plano #e3e3e3 */}
         <svg
           className="absolute pointer-events-none"
-          style={{ left: 0, top: 0, width: cqw(520.5), height: pctY(711.5) }}
-          viewBox="0 0 520.5 711.5"
+          style={{ left: 0, top: 0, width: cqw(497), height: pctY(772) }}
+          viewBox="0 0 497 772"
           preserveAspectRatio="none"
         >
           <path d={PLECA_IZQUIERDA_PATH} fill="#e3e3e3" />
@@ -367,7 +362,7 @@ export default function Niveles() {
       {/* ---------- Mobile / tablet (<lg): reinterpretación apilada ---------- */}
       <div className="relative lg:hidden">
         <div className="relative">
-          <svg className="absolute left-0 top-0 pointer-events-none" width="220" height="300" viewBox="0 0 520.5 711.5" preserveAspectRatio="none">
+          <svg className="absolute left-0 top-0 pointer-events-none" width="220" height="300" viewBox="0 0 497 772" preserveAspectRatio="none">
             <path d={PLECA_IZQUIERDA_PATH} fill="#e3e3e3" />
           </svg>
           <div className="relative flex gap-4 overflow-x-auto px-6 pb-2 pt-8 soft-scrollbar sm:px-10">
