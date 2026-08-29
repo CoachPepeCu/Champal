@@ -14,11 +14,6 @@ const cqw = (px) => `${((px / CANVAS_W) * 100).toFixed(3)}cqw`;
 
 const ASTRONAUT_SHADOW = "drop-shadow(0px 4px 2px rgba(0,0,0,0.25))";
 
-// El degradado que Figma usa para el velo (771:6412) que funde el mural
-// hacia la zona clara del saludo.
-const FADE_TO_WHITE =
-  "linear-gradient(90deg, rgba(249, 249, 246, 0) 0%, rgba(249, 249, 246, 0.45) 16%, rgba(249, 249, 246, 0.92) 28%, rgb(249, 249, 246) 42%, rgb(249, 249, 246) 100%)";
-
 const PARAGRAPH_2 =
   "En nuestro Colegio cada alumno descubre su potencial, aprende con propósito y crece con valores.";
 const PARAGRAPH_1 =
@@ -39,66 +34,30 @@ export default function Bienvenidos() {
     <section className="relative bg-[#fafaf7]">
       {/* ---------- Desktop (>=lg): réplica exacta del canvas 1440x501 ---------- */}
       <div className="relative hidden aspect-[1440/501] w-full lg:block" style={{ containerType: "inline-size" }}>
-        {/* MuralG19 — sí recorta su propio fondo (overflow-clip en Figma).
-            El "Subtract" (768:6324) de Figma es en realidad un círculo
-            completo (centro ~600.5,250.5 / radio 250.5, calculado desde su
-            propio path) relleno con un degradado transparente→blanco, pero
-            el propio nodo lo recorta a una caja más angosta (438 a 870.68 —
-            el círculo real se sale por la izquierda hasta 350, esa parte no
-            se ve en el diseño). El primer intento reconstruyó el CÍRCULO
-            COMPLETO sin ese recorte: al ser más ancho por la izquierda de lo
-            debido, invadía la zona del ADN y creaba un "ADN doble" (el
-            degradado blanco tapando parcialmente una copia, dejando la otra
-            de fondo intacta) y la curva se veía desproporcionada. Por eso el
-            círculo va con clip-path, recortado a la misma caja angosta que
-            usaba el asset original (17.56% = 88/501, la diferencia entre el
-            borde izquierdo del círculo real y el de esa caja). */}
-        <div className="absolute inset-0 overflow-hidden">
-          <Image
-            src="/images/bienvenidos/mural-g19-fondo.png"
-            alt='"Del caos nacen las ESTRELLAS" — mural G19'
-            fill
-            preload
-            sizes="100vw"
-            className="object-cover"
+        {/* Una sola capa opaca y una sola máscara geométrica escalable. */}
+        <svg
+          role="img"
+          aria-label='"Del caos nacen las ESTRELLAS" — mural G19'
+          className="absolute inset-0 h-full w-full overflow-hidden"
+          viewBox="0 0 1440 501"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <clipPath id="bienvenidos-mural-clip">
+              <path d="M0 0H600.5C738.85 0 851 112.15 851 250.5C851 388.85 754.35 501 650 501H0Z" />
+            </clipPath>
+          </defs>
+          <image
+            href="/images/bienvenidos/mural-g19-fondo.png"
+            width="1442"
+            height="501"
+            preserveAspectRatio="xMidYMid slice"
+            clipPath="url(#bienvenidos-mural-clip)"
           />
-          <div
-            className="absolute rounded-full"
-            style={{
-              left: pctX(350),
-              top: pctY(0),
-              width: cqw(501),
-              height: cqw(501),
-              background: "linear-gradient(90deg, rgba(250,250,247,0) 32%, rgba(250,250,247,1) 100%)",
-              clipPath: "inset(0 0 0 17.56%)",
-            }}
-          />
-          {/* El círculo de arriba (igual que el "Subtract" original de
-              Figma) es angosto cerca de y=0 — ahí justo es donde el fondo
-              trae su propio ADN "de fábrica", que por eso seguía asomando
-              (ligeramente desfasado del ADN nítido que pega Hero.js encima,
-              se veía como un segundo ADN fantasma). Este parche sólo tapa
-              esa franja de arriba, con un degradado que se disuelve hacia
-              abajo para no crear un borde recto nuevo. */}
-          <div
-            className="absolute"
-            style={{
-              left: pctX(370),
-              top: pctY(0),
-              width: cqw(600),
-              height: cqw(150),
-              background: "linear-gradient(180deg, rgba(250,250,247,1) 0%, rgba(250,250,247,0.9) 45%, rgba(250,250,247,0) 100%)",
-            }}
-          />
-        </div>
+        </svg>
 
-        {/* Velo que termina de fundir el mural hacia la zona clara del
-            saludo. */}
-        <div className="absolute" style={{ left: pctX(650), top: pctY(-2), width: cqw(790), height: cqw(503), backgroundImage: FADE_TO_WHITE }} />
-
-        {/* Astronauta — DESPUÉS del velo (encima de él) para que nunca quede
-            tapado por el degradado; antes estaba dentro del wrapper de
-            arriba, pintado ANTES que el velo, por eso el velo lo cubría. */}
+        {/* Astronauta en una capa independiente para que pueda cruzar la
+            frontera entre el mural y el panel blanco. */}
         <div className="absolute" style={{ left: pctX(657), top: pctY(245), width: cqw(214), height: cqw(228) }}>
           <Image
             src="/images/bienvenidos/astronauta-flotando.png"
@@ -192,7 +151,7 @@ export default function Bienvenidos() {
             fill
             preload
             sizes="100vw"
-            className="object-cover"
+            className="object-cover object-left"
           />
           <div className="absolute right-[8%] top-[42%] h-[26%] w-[20%]">
             <Image
