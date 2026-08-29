@@ -99,13 +99,20 @@ const SECTION_BACKGROUND =
 
 function EducationalBackground() {
   return (
-    <Image
-      src={`${IMAGE_ROOT}/fondo-educativo.webp`}
-      alt=""
-      fill
-      sizes="100vw"
-      className="pointer-events-none object-cover opacity-10"
-    />
+    <>
+      <Image
+        src={`${IMAGE_ROOT}/fondo-educativo.webp`}
+        alt=""
+        fill
+        sizes="100vw"
+        className="pointer-events-none hidden object-cover object-center opacity-10 lg:block"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[length:100%_auto] bg-top bg-repeat-y opacity-10 lg:hidden"
+        style={{ backgroundImage: `url(${IMAGE_ROOT}/fondo-educativo.webp)` }}
+      />
+    </>
   );
 }
 
@@ -154,10 +161,16 @@ function Island({ island, desktop = false, instanceId, isSectionVisible, reduceM
       >
         <motion.div
           className="relative h-full w-full"
-          animate={{ opacity: hidden ? 0 : 1 }}
+          animate={{
+            opacity: hidden ? 0 : 1,
+            filter: "drop-shadow(0 0 0 rgba(0, 0, 0, 0))",
+          }}
           whileHover={
             reduceMotion
-              ? { filter: "drop-shadow(0 10px 18px rgba(94, 200, 255, 0.85))" }
+              ? {
+                  filter: "drop-shadow(0 10px 18px rgba(94, 200, 255, 0.85))",
+                  transition: { filter: { duration: 0.2, ease: "easeOut" } },
+                }
               : {
                   scale: 1.04,
                   filter: [
@@ -165,13 +178,15 @@ function Island({ island, desktop = false, instanceId, isSectionVisible, reduceM
                     "drop-shadow(0 11px 22px rgba(151, 91, 255, 0.96))",
                     "drop-shadow(0 8px 18px rgba(65, 207, 255, 0.9))",
                   ],
+                  transition: {
+                    scale: { duration: 0.275, ease: "easeOut" },
+                    filter: { duration: 1.35, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
+                  },
                 }
           }
           transition={{
             scale: { duration: 0.275, ease: "easeOut" },
-            filter: reduceMotion
-              ? { duration: 0.2, ease: "easeOut" }
-              : { duration: 1.35, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
+            filter: { duration: 0.2, ease: "easeOut" },
             opacity: { duration: 0.275, ease: "easeOut" },
           }}
         >
@@ -354,13 +369,13 @@ export default function ExploreChampal() {
       className="relative overflow-hidden"
       style={{ backgroundImage: SECTION_BACKGROUND }}
     >
+      <EducationalBackground />
+
       {/* Desktop: canvas exacto de Figma, limitado a 1440 × 760. */}
       <div
         className="relative mx-auto hidden aspect-[1440/760] w-full max-w-[1440px] lg:block"
         style={{ containerType: "inline-size" }}
       >
-        <EducationalBackground />
-
         <div className="absolute inset-0 z-10">
           {ROUTES.map((route) => (
             <DesktopRoute key={route.src} route={route} />
@@ -398,8 +413,6 @@ export default function ExploreChampal() {
 
       {/* Mobile/tablet: adaptación básica, legible y sin superposiciones. */}
       <div className="relative mx-auto w-full max-w-3xl px-4 py-8 lg:hidden sm:px-8 sm:py-10">
-        <EducationalBackground />
-
         <div className="relative z-20 mx-auto aspect-[393/322] w-[82%] max-w-[393px]">
           <Image
             src={`${IMAGE_ROOT}/campus-central.webp`}
