@@ -202,9 +202,9 @@ export default function ActividadesExtracurriculares() {
 
   return (
     <section ref={sectionRef} className="actividades-x" aria-labelledby="actividades-x-title">
+      <Image src={`${BASE}/fondo-nebula.webp`} alt="" fill priority sizes="100vw" className="ax-background" />
+      <Image src={`${BASE}/olas-inferiores.svg`} alt="" width={1440} height={295} className="ax-waves" />
       <div className="ax-stage">
-        <Image src={`${BASE}/fondo-nebula.webp`} alt="" fill priority sizes="(min-width: 1440px) 1440px, 100vw" className="ax-background" />
-        <Image src={`${BASE}/olas-inferiores.svg`} alt="" width={1440} height={295} className="ax-waves" />
         <header className="ax-header">
           <motion.div
             className="ax-eyebrow"
@@ -235,9 +235,9 @@ export default function ActividadesExtracurriculares() {
         </div>
       </div>
       <style>{`
-        .actividades-x{position:relative;overflow-x:clip;overflow-y:visible;background:#07030f;color:#fff}
-        .ax-stage{position:relative;isolation:isolate;width:100%;min-height:100vh;margin-inline:auto;padding:40px 16px 80px;container-type:inline-size}
-        .ax-background{z-index:-2;object-fit:cover}.ax-waves{position:absolute;z-index:-1;bottom:0;left:-35%;width:170%;height:24%;object-fit:fill;pointer-events:none}
+        .actividades-x{position:relative;isolation:isolate;width:100%;min-height:100dvh;overflow-x:clip;overflow-y:visible;background:#07030f;color:#fff}
+        .ax-stage{position:relative;z-index:2;width:100%;min-height:100vh;margin-inline:auto;padding:40px 16px 80px;container-type:inline-size}
+        .ax-background{z-index:0;object-fit:cover;object-position:center center}.ax-waves{position:absolute;z-index:1;bottom:0;left:-35%;width:170%;height:24%;object-fit:fill;pointer-events:none}
         .ax-header{position:relative;z-index:3;max-width:560px;margin:0 auto 36px}.ax-eyebrow{display:flex;align-items:center;gap:12px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
         .ax-eyebrow span{flex:0 0 40px;height:6px;background:#aa181f}.ax-eyebrow p{margin:0;font-family:var(--font-outfit),sans-serif;font-size:12px;line-height:18px;letter-spacing:.012em}
         .ax-title-reveal{margin-top:12px;overflow:hidden}.ax-header h1{margin:0;font-family:var(--font-fredoka),sans-serif;font-size:clamp(34px,10vw,46px);font-weight:500;line-height:1.09;text-shadow:0 4px 4px rgba(0,0,0,.25),0 4px 4px rgba(0,0,0,.25)}
@@ -252,7 +252,7 @@ export default function ActividadesExtracurriculares() {
         @media(min-width:348px){.ax-cards{grid-template-columns:repeat(2,150px)}}
         @media(min-width:640px){.ax-stage{padding-inline:32px}.ax-header{margin-inline:0}.ax-eyebrow p{font-size:14px}.ax-cards{grid-template-columns:repeat(3,150px);column-gap:28px;row-gap:32px}}
         @media(min-width:1024px){
-          .ax-stage{width:100%;max-width:1440px;min-height:0;aspect-ratio:1440/760;padding:0}.ax-background{object-fit:fill}.ax-waves{top:62.105263%;bottom:auto;left:0;width:100%;height:38.815789%}
+          .actividades-x{width:100vw;overflow:hidden}.ax-stage{width:min(100vw,calc(100dvh * 1440 / 760));min-height:0;aspect-ratio:1440/760;padding:0}.ax-waves{left:0;width:100vw;height:min(20.486111vw,38.815789dvh)}
           .ax-header{position:absolute;top:13.947368%;left:10.486111%;width:36.25%;max-width:none;margin:0}.ax-eyebrow{gap:.972222cqw}.ax-eyebrow span{flex-basis:3.888889cqw;height:.416667cqw}.ax-eyebrow p{font-size:1.041667cqw;line-height:1.25cqw}
           .ax-title-reveal{margin-top:.694444cqw}.ax-header h1{font-size:3.194444cqw;line-height:3.472222cqw}.ax-cards{position:absolute;inset:0;display:block;padding-top:0}
           .ax-activity{position:absolute;top:var(--card-top);left:var(--card-left);width:10.416667cqw;height:12.777778cqw}.ax-description,.ax-front{width:10.416667cqw}

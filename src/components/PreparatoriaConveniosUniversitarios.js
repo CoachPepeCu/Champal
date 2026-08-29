@@ -79,11 +79,18 @@ function Balloon({ university, index, mobile = false, reduceMotion }) {
 export default function PreparatoriaConveniosUniversitarios() {
   const reduceMotion = useReducedMotion();
 
-  return <section aria-labelledby="conexion-universitaria" className="relative overflow-hidden bg-[linear-gradient(89.7deg,#637e99_3.8%,#8dbad7_30.9%)]">
-    <div className="relative hidden aspect-[1440/760] w-full lg:block">
-      <div className="absolute -left-[2.57%] top-[62.105%] h-[55%] w-[102.57%]">
-        <Image src={`${BASE}/fondo-montanas-figma.svg`} alt="" fill sizes="103vw" className="object-fill" />
-      </div>
+  return <section aria-labelledby="conexion-universitaria" className="relative min-h-[100dvh] w-full overflow-hidden bg-[linear-gradient(89.7deg,#637e99_3.8%,#8dbad7_30.9%)] lg:w-screen">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute left-[-2.57vw] z-0 hidden w-[102.57vw] lg:block"
+      style={{ bottom: "-9.027778vw", aspectRatio: "1477 / 418" }}
+    >
+      <Image src={`${BASE}/fondo-montanas-figma.svg`} alt="" fill sizes="103vw" className="object-contain object-bottom" />
+    </div>
+    <div
+      className="relative z-10 mx-auto hidden aspect-[1440/760] lg:block"
+      style={{ width: "min(100vw, calc(100dvh * 1440 / 760))" }}
+    >
       <div className="absolute left-[7.15%] top-[7.75%] z-10 w-[30.7%]">
         <motion.div
           className="mb-[5px] flex items-center gap-[14px]"

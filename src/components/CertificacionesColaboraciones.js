@@ -239,20 +239,24 @@ export default function CertificacionesColaboraciones() {
   const visible = play || reduceMotion;
 
   return (
-    <section ref={sectionRef} aria-labelledby="certificaciones-colaboraciones" className="relative overflow-hidden bg-[linear-gradient(181deg,#ededed_1.66%,#bdbdbd_98.43%)]">
+    <section ref={sectionRef} aria-labelledby="certificaciones-colaboraciones" className="relative min-h-[100dvh] w-full overflow-hidden bg-[linear-gradient(181deg,#ededed_1.66%,#bdbdbd_98.43%)] lg:w-screen">
       <div
-        className="relative mx-auto hidden aspect-[1440/760] lg:block"
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 z-0 hidden w-[105.231vw] -translate-x-1/2 lg:block"
         style={{
-          containerType: "inline-size",
-          width: "min(100%, 1440px, calc(100dvh * 1.8947368421))",
+          top: "min(25.416667vw, 48.157895dvh)",
+          aspectRatio: "1515.34 / 581.779",
         }}
       >
-        <div
-          className="pointer-events-none absolute z-0 -translate-x-1/2"
-          style={{ left: "50%", top: y(366), width: "max(105.231%, 100vw)", height: y(581.779) }}
-        >
-          <Image src={`${BASE}/fondo-montanas.svg`} alt="" fill sizes="106vw" className="-scale-y-100 object-fill" />
-        </div>
+        <Image src={`${BASE}/fondo-montanas.svg`} alt="" fill sizes="106vw" className="-scale-y-100 object-contain" />
+      </div>
+      <div
+        className="relative z-10 mx-auto hidden aspect-[1440/760] lg:block"
+        style={{
+          containerType: "inline-size",
+          width: "min(100vw, calc(100dvh * 1440 / 760))",
+        }}
+      >
         <motion.div
           className="pointer-events-none absolute z-[1]"
           style={{ left: x(185), top: y(419), width: cw(209.1), height: cw(114.2) }}

@@ -76,7 +76,9 @@ export default function CircularCurtainOverlay({
           else if (phase === "revealing") onOpened();
         }}
       >
-        {children}
+        <div className="min-h-[100dvh] w-full">
+          {children}
+        </div>
       </motion.div>
 
       {isRevealed && !isClosing && (

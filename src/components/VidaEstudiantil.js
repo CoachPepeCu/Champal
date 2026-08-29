@@ -230,40 +230,40 @@ export default function VidaEstudiantil() {
 
   return (
     <section className="vida-estudiantil" aria-labelledby="vida-estudiantil-title">
-      <div className="ve-stage">
-        <motion.div
-          className="ve-backgrounds"
-          aria-hidden="true"
-          initial={reduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: reduceMotion ? 0 : 0.78, delay: reduceMotion ? 0 : 0.72, ease: [0.22, 1, 0.36, 1] }}
-        >
+      <motion.div
+        className="ve-backgrounds"
+        aria-hidden="true"
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: reduceMotion ? 0 : 0.78, delay: reduceMotion ? 0 : 0.72, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Image
+          key={`active-${active.id}`}
+          src={active.backgroundImage}
+          alt=""
+          fill
+          unoptimized
+          preload={activeIndex === 0 && incomingIndex === null}
+          sizes="100vw"
+          className="ve-background ve-background-current"
+          style={{ objectPosition: active.backgroundPosition, "--mobile-object-position": active.mobileBackgroundPosition }}
+        />
+        {incoming && (
           <Image
-            key={`active-${active.id}`}
-            src={active.backgroundImage}
+            key={`incoming-${incoming.id}`}
+            src={incoming.backgroundImage}
             alt=""
             fill
             unoptimized
-            preload={activeIndex === 0 && incomingIndex === null}
             sizes="100vw"
-            className="ve-background ve-background-current"
-            style={{ objectPosition: active.backgroundPosition, "--mobile-object-position": active.mobileBackgroundPosition }}
+            className="ve-background ve-background-incoming"
+            style={{ objectPosition: incoming.backgroundPosition, "--mobile-object-position": incoming.mobileBackgroundPosition, "--fade-duration": `${duration}ms` }}
+            onLoad={(event) => event.currentTarget.classList.add("is-visible")}
           />
-          {incoming && (
-            <Image
-              key={`incoming-${incoming.id}`}
-              src={incoming.backgroundImage}
-              alt=""
-              fill
-              unoptimized
-              sizes="100vw"
-              className="ve-background ve-background-incoming"
-              style={{ objectPosition: incoming.backgroundPosition, "--mobile-object-position": incoming.mobileBackgroundPosition, "--fade-duration": `${duration}ms` }}
-              onLoad={(event) => event.currentTarget.classList.add("is-visible")}
-            />
-          )}
-        </motion.div>
+        )}
+      </motion.div>
 
+      <div className="ve-stage">
         <header className="ve-copy">
           <div className="ve-copy-shadow" aria-hidden="true" />
           <motion.div
@@ -349,9 +349,9 @@ export default function VidaEstudiantil() {
       </div>
 
       <style>{`
-        .vida-estudiantil{position:relative;width:100%;overflow-x:clip;background:#15100f;color:#fff}
-        .ve-stage{position:relative;isolation:isolate;width:min(100%,1440px,calc(100dvh * 1.8947368421));aspect-ratio:1440/760;margin-inline:auto;overflow:hidden;container-type:inline-size;background:#15100f}
-        .ve-backgrounds,.ve-background{position:absolute;inset:0}.ve-backgrounds{z-index:-2;background:#15100f}.ve-background{object-fit:cover}
+        .vida-estudiantil{position:relative;isolation:isolate;width:100%;min-height:100dvh;overflow-x:clip;background:#15100f;color:#fff}
+        .ve-stage{position:relative;z-index:1;isolation:isolate;width:min(100vw,calc(100dvh * 1440 / 760));aspect-ratio:1440/760;margin-inline:auto;overflow:hidden;container-type:inline-size}
+        .ve-backgrounds,.ve-background{position:absolute;inset:0}.ve-backgrounds{z-index:0;background:#15100f}.ve-background{object-fit:cover}
         .ve-background-current{opacity:1}.ve-background-incoming{opacity:0;transition:opacity var(--fade-duration,600ms) cubic-bezier(.22,1,.36,1)}.ve-background-incoming.is-visible{opacity:1}
         .ve-copy{position:absolute;z-index:3;left:3.125%;top:9.6053%;width:22.9167%;font-family:var(--font-fredoka),sans-serif;text-shadow:0 4px 4px rgba(0,0,0,.25)}
         .ve-copy-shadow{position:absolute;z-index:-1;left:-7%;top:-16%;width:111%;height:108%;background:rgba(91,91,91,.6);filter:blur(33.5px);pointer-events:none}
@@ -371,13 +371,14 @@ export default function VidaEstudiantil() {
         .ve-control-next img{transform:rotate(180deg)}
         .ve-control:focus-visible{outline:3px solid #79d8ff;outline-offset:4px;transform:scale(1.06);filter:drop-shadow(0 0 9px rgba(113,211,255,.95))}
         .ve-control:active:not(:disabled){transform:scale(.94)}.ve-control:disabled{cursor:default}
+        @media (min-width:1024px){.vida-estudiantil{width:100vw;overflow:hidden}}
         @media (max-width:1023px){
-          .ve-stage{width:100%;height:760px;aspect-ratio:auto;min-height:760px}
+          .ve-backgrounds{height:760px;bottom:auto}.ve-stage{width:100%;height:760px;aspect-ratio:auto;min-height:760px}
           .ve-copy{left:5%;top:7%;width:min(44%,390px)}.ve-eyebrow{gap:12px;height:18px}.ve-eyebrow span{width:48px;height:6px}.ve-eyebrow p{font-size:14px;line-height:18px}.ve-copy h2{margin-top:10px;font-size:clamp(32px,5vw,42px);line-height:1.12}
           .ve-viewport{left:42%;top:52%;width:58%;height:320px;padding:10px 20px}.ve-controls{left:auto;right:5%;top:auto;bottom:15px}
         }
         @media (max-width:639px){
-          .ve-stage{height:820px;min-height:820px;overflow:hidden;background:#15100f}
+          .ve-stage{height:820px;min-height:820px;overflow:hidden}
           .ve-backgrounds{height:400px;bottom:auto}.ve-background{object-position:var(--mobile-object-position,50% 50%)!important;filter:saturate(.96)}
           .ve-backgrounds:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.12) 0%,rgba(0,0,0,.08) 33%,rgba(17,12,11,.38) 48%,rgba(17,12,11,.78) 100%)}
           .ve-copy{left:24px;top:34px;width:calc(100% - 48px)}.ve-copy-shadow{left:-12px;top:-12px;width:min(370px,100%);height:205px;filter:blur(28px)}
