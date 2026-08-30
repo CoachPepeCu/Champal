@@ -7,7 +7,7 @@ const COLUMNS = [
     widthClass: "lg:w-[180px]",
     links: [
       { label: "Acerca del Colegio" },
-      { label: "Comunidad" },
+      { label: "Comunidad", href: "/comunidad" },
     ],
   },
   {
