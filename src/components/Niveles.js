@@ -200,7 +200,7 @@ const LEVELS = [
 function LevelCard({ level, compact = false }) {
   return (
     <Link
-      href={level.href}
+      href={`${level.href}?origen=niveles`}
       aria-label={`Conoce ${level.label.join(" ")}`}
       className="group relative aspect-square shrink-0 rounded-[10px] transition-transform duration-300 ease-out hover:scale-[1.025] focus-visible:scale-[1.025] focus-visible:outline-none"
       style={{
@@ -272,7 +272,7 @@ function LevelCard({ level, compact = false }) {
 
 export default function Niveles() {
   return (
-    <section className="relative overflow-hidden" style={{ backgroundImage: SECTION_GRADIENT }}>
+    <section id="niveles-educativos" className="relative scroll-mt-[88px] overflow-hidden" style={{ backgroundImage: SECTION_GRADIENT }}>
       {/* ---------- Desktop (>=lg): réplica exacta del canvas 1440x772 ---------- */}
       <div className="relative hidden aspect-[1440/772] w-full lg:block" style={{ containerType: "inline-size" }}>
         {/* Pleca_Izquierda — vector exacto de Figma, color plano #e3e3e3 */}
@@ -297,16 +297,11 @@ export default function Niveles() {
 
         {/* Bloque IHS: pleca + globo + banderas + textos */}
         <Link
-          href="/niveles/preparatoria#international-high-school"
+          href="/niveles/preparatoria?origen=niveles#international-high-school"
           aria-label="Conoce International High School"
           className="group absolute left-0 transition-transform duration-300 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none"
           style={{ top: pctY(342), width: "100%", height: pctY(430), transformOrigin: "50% 50%" }}
         >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-[3%] rounded-[36px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 group-focus-visible:opacity-100"
-            style={{ boxShadow: "0 0 34px 10px rgba(151, 205, 255, 0.48), inset 0 0 24px rgba(255,255,255,0.2)" }}
-          />
           {(() => {
             const ihsPctY = (px) => `${((px / 430) * 100).toFixed(3)}%`;
             return (
@@ -315,8 +310,32 @@ export default function Niveles() {
                     roja, textos, bandera— baja el mismo tanto; si no, el
                     hueco entre placa y contenido cambia y aparecen encimes
                     que no existían (la bandera invadiendo el texto). */}
-                <div className="absolute" style={{ left: cqw(24), top: ihsPctY(-8 + PANEL_SHIFT), width: cqw(1402.88), height: ihsPctY(430.45) }}>
-                  <Image src="/images/niveles/pleca-inferior-ihs.svg" alt="" fill sizes="98vw" className="object-contain" />
+                <div
+                  className="absolute transition-[filter] duration-300 ease-out group-hover:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.9))_drop-shadow(0_0_24px_rgba(125,211,252,0.9))] group-focus-visible:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.9))_drop-shadow(0_0_24px_rgba(125,211,252,0.9))]"
+                  style={{ left: cqw(24), top: ihsPctY(-8 + PANEL_SHIFT), width: cqw(1402.88), height: ihsPctY(430.45) }}
+                >
+                  <Image
+                    src="/images/niveles/pleca-inferior-ihs.svg"
+                    alt=""
+                    fill
+                    sizes="98vw"
+                    className="object-contain transition-opacity duration-300 ease-out group-hover:opacity-0 group-focus-visible:opacity-0"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 group-focus-visible:opacity-100"
+                    style={{
+                      background: "linear-gradient(180deg, #7fa4c7 0%, #5B82A6 52%, #3f6489 100%)",
+                      WebkitMaskImage: "url(/images/niveles/pleca-inferior-ihs.svg)",
+                      WebkitMaskPosition: "center",
+                      WebkitMaskRepeat: "no-repeat",
+                      WebkitMaskSize: "contain",
+                      maskImage: "url(/images/niveles/pleca-inferior-ihs.svg)",
+                      maskPosition: "center",
+                      maskRepeat: "no-repeat",
+                      maskSize: "contain",
+                    }}
+                  />
                 </div>
 
                 {/* Globo + halo — valores exactos del nodo (left 592/597, top
@@ -399,7 +418,7 @@ export default function Niveles() {
         </div>
 
         <Link
-          href="/niveles/preparatoria#international-high-school"
+          href="/niveles/preparatoria?origen=niveles#international-high-school"
           aria-label="Conoce International High School"
           className="group relative block px-6 pb-14 pt-10 transition-transform duration-300 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none sm:px-10"
         >

@@ -21,6 +21,7 @@ export default function CircularCurtainOverlay({
   onFlightComplete,
   onOpened,
   onClosed,
+  showFlight = true,
 }) {
   const dialogRef = useRef(null);
 
@@ -46,7 +47,7 @@ export default function CircularCurtainOverlay({
   const openClip = `circle(150vmax at ${origin.x}px ${origin.y}px)`;
   const isClosing = phase === "closing";
   const isRevealed = phase === "revealing" || phase === "open";
-  const curtainDuration = reduceMotion ? 0.18 : 0.7;
+  const curtainDuration = reduceMotion ? 0.01 : 0.7;
   const flightScale = reduceMotion
     ? 1
     : Math.max(window.innerWidth / flight.width, window.innerHeight / flight.height) * 0.78;
@@ -64,7 +65,7 @@ export default function CircularCurtainOverlay({
       style={{ zIndex: OVERLAY_Z_INDEX }}
     >
       <motion.div
-        className="fixed inset-0 overflow-y-auto bg-[#637e99] outline-none"
+        className="fixed inset-0 overflow-x-hidden overflow-y-auto bg-[#637e99] outline-none"
         initial={{ clipPath: closedClip }}
         animate={{ clipPath: isRevealed && !isClosing ? openClip : closedClip }}
         transition={{
@@ -89,7 +90,7 @@ export default function CircularCurtainOverlay({
         />
       )}
 
-      {(phase === "flying" || phase === "revealing") && (
+      {showFlight && (phase === "flying" || phase === "revealing") && (
         <motion.div
           aria-hidden="true"
           className="pointer-events-none fixed"
@@ -108,7 +109,7 @@ export default function CircularCurtainOverlay({
             opacity: phase === "revealing" || reduceMotion ? 0 : 1,
           }}
           transition={{
-            duration: reduceMotion ? 0.08 : phase === "revealing" ? 0.36 : 0.66,
+            duration: reduceMotion ? 0.01 : phase === "revealing" ? 0.36 : 0.66,
             ease: phase === "revealing" ? "easeOut" : [0.22, 1, 0.36, 1],
           }}
           onAnimationComplete={() => {

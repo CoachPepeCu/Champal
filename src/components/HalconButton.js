@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 // Botón flotante "Halcón" (nodo Figma 357:807) — componente compartido,
 // pensado para usarse en cualquier página de nivel (reemplaza al botón
@@ -46,6 +46,7 @@ export default function HalconButton({
   className = "",
 }) {
   const [visible, setVisible] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (onClick) return undefined;
@@ -65,10 +66,10 @@ export default function HalconButton({
         <MotionControl
           {...(onClick ? { type: "button", onClick } : { href: `#${targetId}` })}
           aria-label={ariaLabel ?? label}
-          initial={{ opacity: 0, scale: 0.6, y: 20 }}
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.6, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.6, y: 20 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.6, y: 20 }}
+          transition={{ duration: reduceMotion ? 0.01 : 0.35, ease: "easeOut" }}
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           className={`group fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full ${className}`}
@@ -77,12 +78,12 @@ export default function HalconButton({
               "ping" del botón de WhatsApp (no una entrada de una sola
               vez): crecen y se desvanecen en bucle, uno detrás del otro. */}
           <motion.span
-            className="pointer-events-none absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white"
+            className={`pointer-events-none absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white ${reduceMotion ? "hidden" : ""}`}
             animate={{ opacity: [0.6, 0], scale: [1, 1.4] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut", delay: 0 }}
           />
           <motion.span
-            className="pointer-events-none absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white"
+            className={`pointer-events-none absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white ${reduceMotion ? "hidden" : ""}`}
             animate={{ opacity: [0.6, 0], scale: [1, 1.4] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut", delay: 0.9 }}
           />

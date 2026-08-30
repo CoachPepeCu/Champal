@@ -1,4 +1,10 @@
+"use client";
+
 import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "motion/react";
+import NuestraHistoria from "@/components/nuestra-historia/NuestraHistoria";
+import CircularCurtainOverlay from "@/components/effects/CircularCurtainOverlay";
 
 // ============================================================================
 // NosotrosHistoria — banner "Conoce Nuestra Historia / Nuestro Futuro" del
@@ -48,7 +54,7 @@ function DesktopFrame() {
           el espacio visual real. */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <h2
-          className="font-serif font-bold uppercase leading-none whitespace-nowrap text-white"
+          className="font-serif font-bold uppercase leading-none whitespace-nowrap text-white transition-[filter] duration-300 group-hover:[filter:drop-shadow(0_0_8px_rgba(255,255,255,1))_drop-shadow(0_0_22px_rgba(56,189,248,0.95))] motion-reduce:transition-none"
           style={{
             fontSize: unit(64),
             letterSpacing: unit(7.68),
@@ -91,7 +97,7 @@ function MobileFrame() {
 
       <div className="relative flex flex-col items-center gap-4 px-6 py-14 text-center sm:gap-5 sm:py-20">
         <h2
-          className="font-serif font-bold uppercase leading-tight text-white"
+          className="font-serif font-bold uppercase leading-tight text-white transition-[filter] duration-300 group-hover:[filter:drop-shadow(0_0_8px_rgba(255,255,255,1))_drop-shadow(0_0_22px_rgba(56,189,248,0.95))] motion-reduce:transition-none"
           style={{
             fontSize: "clamp(24px, 7vw, 40px)",
             letterSpacing: "0.12em",
@@ -119,10 +125,114 @@ function MobileFrame() {
 }
 
 export default function NosotrosHistoria() {
+  const triggerRef = useRef(null);
+  const bodyLockRef = useRef(null);
+  const [phase, setPhase] = useState("idle");
+  const [flight, setFlight] = useState(null);
+  const reduceMotion = useReducedMotion();
+
+  const restoreBody = useCallback(() => {
+    const lock = bodyLockRef.current;
+    if (!lock) return;
+
+    const body = document.body;
+    Object.assign(body.style, lock.styles);
+    window.scrollTo({ left: lock.scrollX, top: lock.scrollY, behavior: "instant" });
+    bodyLockRef.current = null;
+  }, []);
+
+  useEffect(() => () => restoreBody(), [restoreBody]);
+
+  const openOverlay = useCallback((event) => {
+    if (phase !== "idle") return;
+
+    const trigger = event.currentTarget;
+    const rect = trigger.getBoundingClientRect();
+    const body = document.body;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+    const computedPaddingRight = Number.parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+
+    bodyLockRef.current = {
+      scrollX,
+      scrollY,
+      styles: {
+        overflow: body.style.overflow,
+        position: body.style.position,
+        top: body.style.top,
+        left: body.style.left,
+        width: body.style.width,
+        paddingRight: body.style.paddingRight,
+      },
+    };
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = `-${scrollX}px`;
+    document.body.style.width = "100%";
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
+
+    triggerRef.current = trigger;
+    setFlight({
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+      src: FONDO,
+      origin: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+    });
+    setPhase("revealing");
+  }, [phase]);
+
+  const closeOverlay = useCallback(() => {
+    setPhase((current) => (current === "idle" || current === "closing" ? current : "closing"));
+  }, []);
+
+  const finishClose = useCallback(() => {
+    restoreBody();
+    setPhase("idle");
+    setFlight(null);
+    requestAnimationFrame(() => {
+      triggerRef.current?.focus({ preventScroll: true });
+      triggerRef.current = null;
+    });
+  }, [restoreBody]);
+
   return (
-    <section id="nuestra-historia" className="relative bg-[#0a2540]" aria-label="Conoce nuestra historia">
-      <DesktopFrame />
-      <MobileFrame />
-    </section>
+    <>
+      <section id="nuestra-historia" className="group relative bg-[#0a2540]" aria-label="Conoce nuestra historia">
+        <div className={phase === "idle" ? "" : "opacity-0"}>
+          <DesktopFrame />
+          <MobileFrame />
+        </div>
+
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-label="Abrir Nuestra Historia"
+          className="absolute inset-0 z-10 cursor-pointer transition-colors duration-200 hover:bg-white/5 active:bg-[#0a2540]/10 focus-visible:bg-white/5 focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-white motion-reduce:transition-none"
+          onClick={openOverlay}
+        />
+      </section>
+
+      {phase !== "idle" && flight && (
+        <CircularCurtainOverlay
+          phase={phase}
+          origin={flight.origin}
+          flight={flight}
+          reduceMotion={reduceMotion}
+          ariaLabel="Nuestra Historia"
+          showFlight={false}
+          onClose={closeOverlay}
+          onFlightComplete={() => setPhase((current) => (current === "flying" ? "revealing" : current))}
+          onOpened={() => setPhase((current) => (current === "revealing" ? "open" : current))}
+          onClosed={finishClose}
+        >
+          <NuestraHistoria />
+        </CircularCurtainOverlay>
+      )}
+    </>
   );
 }

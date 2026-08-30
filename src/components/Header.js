@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,13 +19,12 @@ const SUBMENU_NIVELES = [
   { label: "Primaria", href: "/niveles/primaria" },
   { label: "Secundaria", href: "/niveles/secundaria" },
   { label: "Preparatoria", href: "/niveles/preparatoria", dividerAfter: "navy" },
-  { label: "International High School", href: "/#international-high-school" },
+  { label: "International High School", href: "/niveles/preparatoria#international-high-school" },
 ];
 
 const NAV_LINKS = [
   { label: "Niveles", href: "/#niveles-educativos", submenu: SUBMENU_NIVELES },
   { label: "Explora Champal", href: "/#vida-estudiantil" },
-  { label: "Admisiones", href: "/#admisiones" },
   { label: "Contacto", href: "/#contacto" },
 ];
 
@@ -33,12 +32,9 @@ const NAV_LINKS = [
 // para que quede documentado junto a los estilos que dependen de él.
 const HEADER_HEIGHT = 88;
 
-// Tono claro (sobre el Hero) y tono azul marino (al salir del Hero) — misma
-// receta de degradado, solo cambia el canal de color, per client request.
-const BAR_GRADIENT_LIGHT =
-  "linear-gradient(90deg, #fff 4.89%, rgba(255,255,255,0.10) 53.88%, rgba(255,255,255,0.03) 92%)";
-const BAR_GRADIENT_NAVY =
-  "linear-gradient(90deg, #102c54 4.89%, rgba(16,44,84,0.10) 53.88%, rgba(16,44,84,0.03) 92%)";
+const BAR_BACKGROUND = "rgba(10, 37, 64, 0.82)";
+const LOGO_GLASS_GRADIENT =
+  "linear-gradient(90deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.9) 68%, rgba(255,255,255,0) 100%)";
 
 const PLATAFORMA_HREF = "/#nosotros";
 
@@ -56,6 +52,13 @@ const NOISE_BG =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
 const NAV_TEXT_SHADOW = "0 1px 3px rgba(0,0,0,0.25)";
+
+const subscribeToLocation = (callback) => {
+  window.addEventListener("popstate", callback);
+  return () => window.removeEventListener("popstate", callback);
+};
+const getLocationSearch = () => window.location.search;
+const getServerLocationSearch = () => "";
 
 // Línea "profunda" del submenú: un borde tenue seguido de un filo más claro
 // justo debajo, para dar sensación de grabado/relieve en vez de una línea plana.
@@ -87,7 +90,7 @@ function Chevron({ open }) {
   );
 }
 
-function NavLabel({ label, showChevron, open, textColor }) {
+function NavLabel({ label, showChevron, open }) {
   return (
     <>
       {/* Glow suave detrás de la etiqueta, aparece en hover */}
@@ -101,8 +104,8 @@ function NavLabel({ label, showChevron, open, textColor }) {
           interiores `textColor` siempre llega en blanco, sin cambios. El
           hover a `--color-primary` se mantiene igual en ambos casos. */}
       <span
-        className="relative flex items-center gap-1 text-2xl font-semibold transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:text-[var(--color-primary)]"
-        style={{ textShadow: NAV_TEXT_SHADOW, color: textColor }}
+        className="relative flex items-center gap-1 text-2xl font-semibold text-white transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:text-[#6C95CE]"
+        style={{ textShadow: NAV_TEXT_SHADOW }}
       >
         {label}
         {showChevron && <Chevron open={open} />}
@@ -161,7 +164,7 @@ function NivelesSubmenu() {
   );
 }
 
-function DesktopNavItem({ link, textColor }) {
+function DesktopNavItem({ link }) {
   const [open, setOpen] = useState(false);
   const closeTimeout = useRef(null);
 
@@ -181,7 +184,7 @@ function DesktopNavItem({ link, textColor }) {
         href={link.href}
         className="group relative flex h-full items-center whitespace-nowrap"
       >
-        <NavLabel label={link.label} showChevron={!!link.submenu} open={open} textColor={textColor} />
+        <NavLabel label={link.label} showChevron={!!link.submenu} open={open} />
       </a>
       <AnimatePresence>{open && link.submenu && <NivelesSubmenu />}</AnimatePresence>
     </div>
@@ -190,70 +193,11 @@ function DesktopNavItem({ link, textColor }) {
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolledPastHero, setScrolledPastHero] = useState(false);
   const pathname = usePathname();
+  const locationSearch = useSyncExternalStore(subscribeToLocation, getLocationSearch, getServerLocationSearch);
   const isHome = pathname === "/";
-
-  useEffect(() => {
-    const heroEl = document.getElementById("top");
-    if (!heroEl) return undefined;
-    const observer = new IntersectionObserver(
-      ([entry]) => setScrolledPastHero(!entry.isIntersecting),
-      { rootMargin: `-${HEADER_HEIGHT}px 0px 0px 0px`, threshold: 0 }
-    );
-    observer.observe(heroEl);
-    return () => observer.disconnect();
-  }, []);
-
-  // Color del texto del menú (SOLO Home): la mayoría de las secciones de
-  // Home son claras (blanco/gris casi blanco) — solo Hero/GlobalReach/
-  // FinalCTA son oscuras (etiquetadas `data-nav-theme="dark"`). El truco de
-  // arriba (`scrolledPastHero`, binario Hero-sí/Hero-no vía
-  // IntersectionObserver + rootMargin) sirve para el TINTE del cristal,
-  // pero no alcanza para el TEXTO: necesitamos saber, en cualquier punto
-  // del scroll, si la franja EXACTA del header (0 a 88px) se topa con
-  // alguna sección oscura — no "sigue habiendo algo oscuro más abajo en la
-  // pantalla", que es lo que ese rootMargin realmente mide. Por eso acá se
-  // usa un chequeo directo por scroll (rAF-throttled) contra
-  // getBoundingClientRect() de cada sección oscura, en vez de otro
-  // IntersectionObserver. Arranca en `true` (Hero, lo primero visible, es
-  // oscuro) para no parpadear en azul antes de que el efecto corra.
-  //
-  // En páginas interiores esto NO corre — el texto se queda blanco fijo,
-  // igual que hasta ahora (a pedido explícito del usuario, "puede quedar
-  // igual"; no hay secciones etiquetadas fuera de Home todavía).
-  const [overDark, setOverDark] = useState(true);
-
-  useEffect(() => {
-    if (!isHome) return undefined;
-    const darkEls = Array.from(document.querySelectorAll('[data-nav-theme="dark"]'));
-    if (darkEls.length === 0) return undefined;
-
-    let raf = null;
-    function check() {
-      raf = null;
-      const dark = darkEls.some((el) => {
-        const r = el.getBoundingClientRect();
-        return r.top < HEADER_HEIGHT && r.bottom > 0;
-      });
-      setOverDark(dark);
-    }
-    function onScrollOrResize() {
-      if (raf) return;
-      raf = requestAnimationFrame(check);
-    }
-
-    check();
-    window.addEventListener("scroll", onScrollOrResize, { passive: true });
-    window.addEventListener("resize", onScrollOrResize);
-    return () => {
-      window.removeEventListener("scroll", onScrollOrResize);
-      window.removeEventListener("resize", onScrollOrResize);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [isHome]);
-
-  const navTextColor = !isHome || overDark ? "#ffffff" : "var(--color-primary)";
+  const origin = new URLSearchParams(locationSearch).get("origen");
+  const logoHref = pathname.startsWith("/niveles/") && origin === "niveles" ? "/#niveles-educativos" : "/#top";
 
   // Ocultar al bajar / reaparecer al subir (SOLO páginas interiores — en
   // Home el header se queda siempre visible, "sticky", como hasta ahora).
@@ -299,9 +243,7 @@ export default function Header() {
       <div
         className="relative"
         style={{
-          // El blur/sombra son constantes — el cristal se mantiene siempre;
-          // lo único que cambia con el scroll es el tono del degradado
-          // (ver capas .bg-light / .bg-navy más abajo).
+          backgroundColor: BAR_BACKGROUND,
           backdropFilter: "blur(15px)",
           WebkitBackdropFilter: "blur(15px)",
           // Suavizada respecto a la versión original (0 10px 34px .38): esa
@@ -313,12 +255,8 @@ export default function Header() {
         }}
       >
         <div
-          className="absolute inset-0 transition-opacity duration-500 ease-out"
-          style={{ backgroundImage: BAR_GRADIENT_LIGHT, opacity: scrolledPastHero ? 0 : 1 }}
-        />
-        <div
-          className="absolute inset-0 transition-opacity duration-500 ease-out"
-          style={{ backgroundImage: BAR_GRADIENT_NAVY, opacity: scrolledPastHero ? 1 : 0 }}
+          className="pointer-events-none absolute inset-y-0 left-0 w-[clamp(230px,27vw,390px)]"
+          style={{ backgroundImage: LOGO_GLASS_GRADIENT }}
         />
         <div
           className="pointer-events-none absolute inset-0"
@@ -333,7 +271,7 @@ export default function Header() {
 
         <div className="relative w-full px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="flex h-[88px] items-center justify-between">
-            <Link href="/#top" className="group flex items-center shrink-0">
+            <Link href={logoHref} className="group flex items-center shrink-0">
               <Image
                 src="/logo-champal-3d.png"
                 alt="Colegio Champal"
@@ -349,7 +287,7 @@ export default function Header() {
 
             <nav className="hidden lg:flex items-center gap-[27px] h-full">
               {NAV_LINKS.map((link) => (
-                <DesktopNavItem key={link.href} link={link} textColor={navTextColor} />
+                <DesktopNavItem key={link.href} link={link} />
               ))}
             </nav>
 
@@ -380,7 +318,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setIsOpen((v) => !v)}
-              className="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-primary"
+              className="inline-flex items-center justify-center rounded-md p-2 text-white lg:hidden"
               aria-label="Abrir menú"
               aria-expanded={isOpen}
             >
