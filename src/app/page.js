@@ -4,6 +4,7 @@ import Bienvenidos from "@/components/Bienvenidos";
 import Comunidad from "@/components/Comunidad";
 import Niveles from "@/components/Niveles";
 import ExploreChampal from "@/components/ExploreChampal";
+import NosotrosHistoria from "@/components/nosotros/NosotrosHistoria";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -17,6 +18,7 @@ export default function Home() {
         <Comunidad />
         <Niveles />
         <ExploreChampal />
+        <NosotrosHistoria />
       </main>
       <Footer />
       <WhatsAppButton />
