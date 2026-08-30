@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 // Réplica 1:1 de Figma para "03_niveles" (node 817:976, canvas 1440x772) —
 // va pegada justo después de 02_Comunidad. Misma técnica que Comunidad.js:
@@ -102,6 +103,7 @@ function VerticalLabel({ box, fontSize, tracking, lines }) {
 const LEVELS = [
   {
     slug: "prekinder",
+    href: "/niveles/pre-kinder",
     label: ["PRE-", "KINDER"],
     labelBox: { left: 239.22, top: 35.56, width: 80, height: 167 },
     labelFontSize: 43.333,
@@ -113,6 +115,7 @@ const LEVELS = [
   },
   {
     slug: "kinder",
+    href: "/niveles/kinder",
     label: ["KINDER"],
     labelBox: { left: 235.89, top: 40.56, width: 40, height: 167 },
     labelFontSize: 43.333,
@@ -128,6 +131,7 @@ const LEVELS = [
   },
   {
     slug: "primaria",
+    href: "/niveles/primaria",
     label: ["PRIMARIA"],
     labelBox: { left: 227, top: 6.44, width: 40, height: 224 },
     labelFontSize: 43.333,
@@ -149,6 +153,7 @@ const LEVELS = [
   },
   {
     slug: "secundaria",
+    href: "/niveles/secundaria",
     label: ["SECUNDARIA"],
     labelBox: { left: 233.11, top: 30.44, width: 40, height: 193 },
     labelFontSize: 28,
@@ -170,6 +175,7 @@ const LEVELS = [
   },
   {
     slug: "preparatoria",
+    href: "/niveles/preparatoria",
     label: ["PREPARATORIA"],
     labelBox: { left: 234.22, top: 9.22, width: 40, height: 227 },
     labelFontSize: 28,
@@ -193,15 +199,24 @@ const LEVELS = [
 
 function LevelCard({ level, compact = false }) {
   return (
-    <div
-      id={level.slug}
-      className="relative aspect-square shrink-0 overflow-hidden rounded-[10px] border-[3px] border-white shadow-[0px_2.222px_2.222px_0px_rgba(0,0,0,0.25)]"
+    <Link
+      href={level.href}
+      aria-label={`Conoce ${level.label.join(" ")}`}
+      className="group relative aspect-square shrink-0 rounded-[10px] transition-transform duration-300 ease-out hover:scale-[1.025] focus-visible:scale-[1.025] focus-visible:outline-none"
       style={{
         width: compact ? "200px" : cqw(CARD),
-        backgroundColor: "#f0f0fa",
         containerType: "inline-size",
       }}
     >
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-5 rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 group-focus-visible:opacity-100"
+        style={{
+          background: "radial-gradient(closest-side, rgba(80,200,255,0.98), rgba(38,174,255,0.78) 48%, rgba(0,153,255,0.42) 68%, rgba(0,153,255,0) 84%)",
+          filter: "blur(8px)",
+        }}
+      />
+      <div className="relative h-full w-full overflow-hidden rounded-[10px] border-[3px] border-white bg-[#f0f0fa] shadow-[0px_2.222px_2.222px_0px_rgba(0,0,0,0.25)] transition-shadow duration-300 ease-out group-hover:shadow-[0_0_30px_9px_rgba(46,190,255,0.9)] group-focus-visible:shadow-[0_0_30px_9px_rgba(46,190,255,0.9)]">
       {/* Orden de capas = orden de hijos en el export de Figma: el cúmulo de
           estrellas / sticker, las estrellas sueltas, el listón y el rótulo
           van DETRÁS de la foto (la foto los tapa donde se superponen); el
@@ -250,7 +265,8 @@ function LevelCard({ level, compact = false }) {
           <Image src={level.decal.src} alt={level.decal.alt} fill sizes="10vw" className="pointer-events-none object-contain" />
         </div>
       )}
-    </div>
+      </div>
+    </Link>
   );
 }
 
@@ -280,7 +296,17 @@ export default function Niveles() {
         </div>
 
         {/* Bloque IHS: pleca + globo + banderas + textos */}
-        <div className="absolute left-0" style={{ top: pctY(342), width: "100%", height: pctY(430) }}>
+        <Link
+          href="/niveles/preparatoria#international-high-school"
+          aria-label="Conoce International High School"
+          className="group absolute left-0 transition-transform duration-300 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none"
+          style={{ top: pctY(342), width: "100%", height: pctY(430), transformOrigin: "50% 50%" }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-[3%] rounded-[36px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 group-focus-visible:opacity-100"
+            style={{ boxShadow: "0 0 34px 10px rgba(151, 205, 255, 0.48), inset 0 0 24px rgba(255,255,255,0.2)" }}
+          />
           {(() => {
             const ihsPctY = (px) => `${((px / 430) * 100).toFixed(3)}%`;
             return (
@@ -356,7 +382,7 @@ export default function Niveles() {
               </>
             );
           })()}
-        </div>
+        </Link>
       </div>
 
       {/* ---------- Mobile / tablet (<lg): reinterpretación apilada ---------- */}
@@ -372,7 +398,16 @@ export default function Niveles() {
           </div>
         </div>
 
-        <div className="relative px-6 pb-14 pt-10 sm:px-10">
+        <Link
+          href="/niveles/preparatoria#international-high-school"
+          aria-label="Conoce International High School"
+          className="group relative block px-6 pb-14 pt-10 transition-transform duration-300 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none sm:px-10"
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-4 rounded-[28px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 group-focus-visible:opacity-100"
+            style={{ boxShadow: "0 0 30px 8px rgba(151, 205, 255, 0.48), inset 0 0 22px rgba(255,255,255,0.18)" }}
+          />
           <div className="flex items-center gap-3">
             <div className="h-1.5 w-8 rounded-sm" style={{ backgroundColor: "#df3035" }} />
             <p className="font-sans text-sm font-semibold tracking-wide text-white">EDUCACIÓN GLOBAL</p>
@@ -396,7 +431,7 @@ export default function Niveles() {
           <div className="relative mx-auto mt-8 h-40 w-full max-w-xs">
             <Image src="/images/bandera-mexico-eua.png" alt="Bandera de México y Estados Unidos" fill sizes="80vw" className="object-contain" />
           </div>
-        </div>
+        </Link>
       </div>
     </section>
   );
