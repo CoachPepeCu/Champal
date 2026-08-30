@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 
 // Este componente es el navbar del sitio: se reutiliza tal cual en las
@@ -332,7 +333,7 @@ export default function Header() {
 
         <div className="relative w-full px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="flex h-[88px] items-center justify-between">
-            <a href="/#top" className="group flex items-center shrink-0">
+            <Link href="/#top" className="group flex items-center shrink-0">
               <Image
                 src="/logo-champal-3d.png"
                 alt="Colegio Champal"
@@ -344,7 +345,7 @@ export default function Header() {
                 onMouseEnter={(e) => (e.currentTarget.style.filter = "drop-shadow(0 0 18px rgba(56,189,248,0.75))")}
                 onMouseLeave={(e) => (e.currentTarget.style.filter = "drop-shadow(0 0 0 rgba(56,189,248,0))")}
               />
-            </a>
+            </Link>
 
             <nav className="hidden lg:flex items-center gap-[27px] h-full">
               {NAV_LINKS.map((link) => (
@@ -367,12 +368,12 @@ export default function Header() {
               </a>
 
               {SHOW_CTA_BUTTON && (
-                <a
+                <Link
                   href="/#admisiones"
                   className="inline-flex items-center rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent-light transition-colors duration-200"
                 >
                   Agenda una visita
-                </a>
+                </Link>
               )}
             </div>
 
@@ -443,13 +444,13 @@ export default function Header() {
                   Plataforma
                 </a>
                 {SHOW_CTA_BUTTON && (
-                  <a
+                  <Link
                     href="/#admisiones"
                     onClick={() => setIsOpen(false)}
                     className="inline-flex items-center justify-center rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white"
                   >
                     Agenda una visita
-                  </a>
+                  </Link>
                 )}
               </div>
             </motion.nav>

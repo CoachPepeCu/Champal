@@ -315,32 +315,32 @@ function Globo({ hoveredId, cardRefs }) {
   const [layout, setLayout] = useState(null);
 
   useEffect(() => {
-    if (!hoveredId) {
-      setLayout(null);
-      return;
-    }
-    const el = cardRefs.current[hoveredId];
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const width = GLOBO_W;
-    const height = width / GLOBO_ASPECT;
-    let left = r.left + r.width / 2 - width / 2;
-    left = Math.min(Math.max(left, 8), window.innerWidth - width - 8);
-    // Empalme ligero con la tarjeta (en vez de flotar separado): el globo
-    // se mete GLOBO_OVERLAP px sobre el borde de la tarjeta.
-    const topIfAbove = r.top + GLOBO_OVERLAP - height;
-    // Si no cabe arriba (contando el header fijo, ~88px), se voltea
-    // verticalmente y aparece abajo de la tarjeta con la cola hacia arriba.
-    const flip = topIfAbove < 96;
-    const top = flip ? r.bottom - GLOBO_OVERLAP : topIfAbove;
-    setLayout({ left, top, width, height, flip });
+    if (!hoveredId) return;
+    const frame = requestAnimationFrame(() => {
+      const el = cardRefs.current[hoveredId];
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const width = GLOBO_W;
+      const height = width / GLOBO_ASPECT;
+      let left = r.left + r.width / 2 - width / 2;
+      left = Math.min(Math.max(left, 8), window.innerWidth - width - 8);
+      // Empalme ligero con la tarjeta (en vez de flotar separado): el globo
+      // se mete GLOBO_OVERLAP px sobre el borde de la tarjeta.
+      const topIfAbove = r.top + GLOBO_OVERLAP - height;
+      // Si no cabe arriba (contando el header fijo, ~88px), se voltea
+      // verticalmente y aparece abajo de la tarjeta con la cola hacia arriba.
+      const flip = topIfAbove < 96;
+      const top = flip ? r.bottom - GLOBO_OVERLAP : topIfAbove;
+      setLayout({ hoveredId, left, top, width, height, flip });
+    });
+    return () => cancelAnimationFrame(frame);
   }, [hoveredId, cardRefs]);
 
   if (typeof document === "undefined") return null;
 
   return createPortal(
     <AnimatePresence>
-      {hoveredId && layout && (
+      {hoveredId && layout?.hoveredId === hoveredId && (
         <motion.div
           className="pointer-events-none fixed"
           style={{ left: layout.left, top: layout.top, width: layout.width, height: layout.height, zIndex: 9999 }}
