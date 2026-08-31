@@ -17,6 +17,7 @@ export default function CircularCurtainOverlay({
   flight,
   reduceMotion,
   ariaLabel = "Conexión Universitaria",
+  closeAriaLabel = "Volver a Conoce Champal",
   onClose,
   onFlightComplete,
   onOpened,
@@ -85,7 +86,7 @@ export default function CircularCurtainOverlay({
       {isRevealed && !isClosing && (
         <HalconButton
           onClick={onClose}
-          ariaLabel="Volver a Conoce Champal"
+          ariaLabel={closeAriaLabel}
           className="!z-[1010]"
         />
       )}

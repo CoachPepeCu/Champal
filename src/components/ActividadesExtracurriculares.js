@@ -50,7 +50,7 @@ function FrontCard({ activity }) {
   );
 }
 
-function ActivityCard({ activity, index, visible, touchOpen, onTouchToggle, onRevealMeasured, reduceMotion }) {
+function ActivityCard({ activity, index, visible, touchOpen, onTouchToggle, onRevealMeasured, onActivate, reduceMotion }) {
   const descriptionRef = useRef(null);
   const descriptionTextRef = useRef(null);
   const focusFrameRef = useRef(null);
@@ -124,6 +124,15 @@ function ActivityCard({ activity, index, visible, touchOpen, onTouchToggle, onRe
       aria-label={activity.title}
       aria-describedby={`${activity.id}-description`}
       aria-expanded={active}
+      aria-haspopup={activity.id === "club-rayados" ? "dialog" : undefined}
+      onClick={(event) => {
+        if (activity.id === "club-rayados") onActivate?.(event.currentTarget);
+      }}
+      onKeyDown={(event) => {
+        if (activity.id !== "club-rayados" || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        onActivate?.(event.currentTarget);
+      }}
       onPointerEnter={(event) => {
         if (event.pointerType === "mouse" && window.matchMedia("(hover: hover) and (pointer: fine)").matches) setMouseHover(true);
       }}
@@ -162,7 +171,7 @@ function ActivityCard({ activity, index, visible, touchOpen, onTouchToggle, onRe
   );
 }
 
-export default function ActividadesExtracurriculares() {
+export default function ActividadesExtracurriculares({ onOpenRayados }) {
   const sectionRef = useRef(null);
   const reduceMotion = useReducedMotion();
   const isInView = useInView(sectionRef, { once: true, amount: 0.12 });
@@ -230,6 +239,7 @@ export default function ActividadesExtracurriculares() {
             touchOpen={touchOpenId === activity.id}
             onTouchToggle={(activityId) => setTouchOpenId((current) => current === activityId ? null : activityId)}
             onRevealMeasured={handleRevealMeasured}
+            onActivate={onOpenRayados}
             reduceMotion={reduceMotion}
           />)}
         </div>

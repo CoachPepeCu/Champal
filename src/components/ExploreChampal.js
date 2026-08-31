@@ -9,6 +9,7 @@ import CampusInteractivo from "@/components/CampusInteractivo";
 import CertificacionesColaboraciones from "@/components/CertificacionesColaboraciones";
 import ConexionUniversitariaGlobos from "@/components/ConexionUniversitariaGlobos";
 import VidaEstudiantil from "@/components/VidaEstudiantil";
+import Rayados from "@/components/rayados/Rayados";
 import CircularCurtainOverlay from "@/components/effects/CircularCurtainOverlay";
 
 const CANVAS_W = 1440;
@@ -263,6 +264,7 @@ export default function ExploreChampal() {
   const [flight, setFlight] = useState(null);
   const [activeWorld, setActiveWorld] = useState(null);
   const [activeInstance, setActiveInstance] = useState(null);
+  const [activeDetail, setActiveDetail] = useState(null);
   const isSectionVisible = useInView(sectionRef, { amount: 0.05 });
   const reduceMotion = useReducedMotion();
   const activeWorldConfig = ISLANDS.find((island) => island.id === activeWorld);
@@ -328,6 +330,11 @@ export default function ExploreChampal() {
   }, [phase]);
 
   const closeOverlay = useCallback(() => {
+    if (activeDetail) {
+      setActiveDetail(null);
+      return;
+    }
+
     setPhase((current) => {
       if (current === "idle" || current === "closing") return current;
 
@@ -346,7 +353,7 @@ export default function ExploreChampal() {
 
       return "closing";
     });
-  }, []);
+  }, [activeDetail]);
 
   const finishClose = useCallback(() => {
     restoreBody();
@@ -354,6 +361,7 @@ export default function ExploreChampal() {
     setFlight(null);
     setActiveWorld(null);
     setActiveInstance(null);
+    setActiveDetail(null);
     geometryRef.current = null;
     requestAnimationFrame(() => {
       triggerRef.current?.focus({ preventScroll: true });
@@ -444,13 +452,20 @@ export default function ExploreChampal() {
           origin={flight.origin}
           flight={flight}
           reduceMotion={reduceMotion}
-          ariaLabel={activeWorldConfig.ariaLabel}
+          ariaLabel={activeDetail === "rayados" ? "Escuela Oficial Rayados de Monterrey" : activeWorldConfig.ariaLabel}
+          closeAriaLabel={activeDetail === "rayados" ? "Volver a Actividades extracurriculares" : "Volver a Conoce Champal"}
           onClose={closeOverlay}
           onFlightComplete={() => setPhase((current) => (current === "flying" ? "revealing" : current))}
           onOpened={() => setPhase((current) => (current === "revealing" ? "open" : current))}
           onClosed={finishClose}
         >
-          <ActiveWorldContent />
+          {activeDetail === "rayados" ? (
+            <Rayados />
+          ) : activeWorld === "actividades-extracurriculares" ? (
+            <ActiveWorldContent onOpenRayados={() => setActiveDetail("rayados")} />
+          ) : (
+            <ActiveWorldContent />
+          )}
         </CircularCurtainOverlay>
       )}
     </section>
