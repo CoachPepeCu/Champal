@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import PlanetaOrbital from "@/components/hero/PlanetaOrbital";
+import Cambridge from "@/components/Cambridge";
+import CircularCurtainOverlay from "@/components/effects/CircularCurtainOverlay";
+import Rayados from "@/components/rayados/Rayados";
 import {
   AnimatePresence,
   motion,
   useAnimationFrame,
   useInView,
   useMotionValue,
-  useMotionValueEvent,
   useReducedMotion,
-  useSpring,
   useTransform,
 } from "motion/react";
 
@@ -67,12 +69,9 @@ const HERO_PHOTOS = [
 // astronauta, íconos de insignia) — un box-shadow dibujaría un cuadro visible
 // detrás del recorte, así que se convierten a filter:drop-shadow (sigue el
 // alfa real de la imagen) con los mismos valores.
-const PLANET_GLOW =
-  "drop-shadow(0px 0px 22px rgba(64,224,184,0.18)) drop-shadow(0px 12px 20px rgba(3,10,28,0.46))";
 const BADGE_ICON_SHADOW = "drop-shadow(0px 4px 4px rgba(0,0,0,0.25))";
 const ASTRONAUT_SHADOW = "drop-shadow(0px 12px 16px rgba(0,0,0,0.25))";
 const EASE_OUT = [0.16, 1, 0.3, 1];
-const ORBIT_ENTRY_DELAY = 1.76;
 const INTRO = {
   sky: 0,
   curve: 0.08,
@@ -178,6 +177,45 @@ const PLANETS = [
     floatPhase: 5.1,
   },
 ];
+
+const ORBITAL_PLANETS = {
+  cambridge: {
+    texture: "/images/hero/planetas/textura-cambridge.webp",
+    diameter: 127,
+    orbitRadius: 91,
+    orbitDuration: 8,
+    orbitArc: 95,
+    fontSize: 16.5,
+    glow: "rgb(64 224 184 / 18%)",
+  },
+  ihs: {
+    texture: "/images/hero/planetas/textura-ihs.webp",
+    diameter: 142,
+    orbitRadius: 107,
+    orbitDuration: 10,
+    orbitArc: 180,
+    fontSize: 11,
+    glow: "rgb(92 218 255 / 22%)",
+  },
+  rayados: {
+    texture: "/images/hero/planetas/textura-rayados.webp",
+    diameter: 147,
+    orbitRadius: 105,
+    orbitDuration: 8,
+    orbitArc: 80,
+    fontSize: 21,
+    glow: "rgb(92 218 255 / 18%)",
+  },
+  craft: {
+    texture: "/images/hero/planetas/textura-craft.webp",
+    diameter: 145,
+    orbitRadius: 87,
+    orbitDuration: 9,
+    orbitArc: 65,
+    fontSize: 24,
+    glow: "rgb(255 174 42 / 12%)",
+  },
+};
 
 const BADGE_W = 236;
 const BADGE_H = 51;
@@ -301,24 +339,6 @@ function AnimationClock({ clock }) {
   return null;
 }
 
-function OrbitClock({ phase, blend, wait, speed }) {
-  useAnimationFrame((_, delta) => {
-    let seconds = Math.min(delta, 50) / 1000;
-    const remainingWait = Math.max(0, ORBIT_ENTRY_DELAY - wait.get());
-
-    if (remainingWait > 0) {
-      const consumed = Math.min(seconds, remainingWait);
-      wait.set(wait.get() + consumed);
-      seconds -= consumed;
-    }
-
-    if (seconds <= 0) return;
-    if (blend.get() < 1) blend.set(Math.min(1, blend.get() + seconds / 0.5));
-    phase.set(phase.get() + seconds * speed.get() * blend.get());
-  });
-  return null;
-}
-
 function AmbientFloat({ clock, amount, duration, phase = 0, children }) {
   const y = useTransform(clock, (time) => {
     const ramp = Math.min(1, time / 0.55);
@@ -328,129 +348,26 @@ function AmbientFloat({ clock, amount, duration, phase = 0, children }) {
   return <motion.div className="size-full" style={{ y }}>{children}</motion.div>;
 }
 
-function orbitalFrontOpacity(depth, planet) {
-  const fadeStart = planet.orbitFadeStart ?? 0.35;
-  const fadeEnd = planet.orbitFadeEnd ?? 0.1;
-  const progress = Math.max(0, Math.min(1, (depth - fadeEnd) / (fadeStart - fadeEnd)));
-  return progress * progress * (3 - 2 * progress);
-}
-
-function OrbitalCharacter({ planet, phase, blend, character, index, count, cx, cy }) {
-  const centeredIndex = index - (count - 1) / 2;
-  const characterStep = count > 1 ? planet.orbitArc / (count - 1) : 0;
-  const initialAngle = planet.orbitInitialPhase + centeredIndex * characterStep;
-  const characterRef = useRef(null);
-  const angle = useTransform(
-    phase,
-    (elapsed) => planet.orbitInitialPhase - (elapsed / planet.orbitDuration) * Math.PI * 2 + centeredIndex * characterStep,
-  );
-  const depth = useTransform(angle, (value) => Math.cos(value));
-  const x = useTransform(angle, (value) => planet.orbitRadius * Math.sin(value));
-  const y = useTransform(depth, (value) => planet.orbitRadiusY * value);
-  const opacity = useTransform([depth, blend], ([value, mix]) => {
-    const orbitalOpacity = orbitalFrontOpacity(value, planet);
-    return 1 + (orbitalOpacity - 1) * mix;
-  });
-  const filter = useTransform(depth, (value) => {
-    const brightness = 0.84 + ((value + 1) / 2) * 0.16;
-    return `brightness(${brightness}) drop-shadow(0 0 5px rgba(61,214,249,0.72))`;
-  });
-
-  useMotionValueEvent(x, "change", (value) => {
-    characterRef.current?.setAttribute("x", String(cx + value));
-  });
-  useMotionValueEvent(y, "change", (value) => {
-    characterRef.current?.setAttribute("y", String(cy + value));
-  });
-
-  return (
-    <motion.text
-      ref={characterRef}
-      x={cx + planet.orbitRadius * Math.sin(initialAngle)}
-      y={cy + planet.orbitRadiusY * Math.cos(initialAngle)}
-      fill="white"
-      textAnchor="middle"
-      dominantBaseline="middle"
-      fontFamily="var(--font-outfit), Outfit, sans-serif"
-      fontSize={planet.orbitFontSize ?? planet.labelSize}
-      fontWeight="600"
-      style={{ opacity, filter }}
-    >
-      {character}
-    </motion.text>
-  );
-}
-
-function OrbitalCharacterLayer({ planet, phase, blend }) {
-  const fontSize = planet.orbitFontSize ?? planet.labelSize;
-  const marginX = fontSize + 8;
-  const marginY = fontSize + 7;
-  const width = (planet.orbitRadius + marginX) * 2;
-  const height = (planet.orbitRadiusY + marginY) * 2;
-  const cx = width / 2;
-  const cy = height / 2;
-  const characters = Array.from(planet.label);
-
-  return (
-    <svg
-      aria-hidden="true"
-      className="pointer-events-none absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 overflow-visible"
-      width={cqw(width)}
-      height={cqw(height)}
-      viewBox={`0 0 ${width} ${height}`}
-      style={{ overflow: "visible", zIndex: 3 }}
-    >
-      <g>
-        {characters.map((character, index) => (
-          <OrbitalCharacter
-            key={`${index}-${character}`}
-            planet={planet}
-            phase={phase}
-            blend={blend}
-            character={character}
-            index={index}
-            count={characters.length}
-            cx={cx}
-            cy={cy}
-          />
-        ))}
-      </g>
-    </svg>
-  );
-}
-
-function OrbitLabel({ planet, active, hovered, children }) {
-  const phase = useMotionValue(0);
-  const blend = useMotionValue(0);
-  const wait = useMotionValue(0);
-  const speedTarget = useMotionValue(hovered ? 0.28 : 1);
-  const speed = useSpring(speedTarget, { stiffness: 75, damping: 20, mass: 0.7 });
-
-  useEffect(() => {
-    speedTarget.set(hovered ? 0.28 : 1);
-  }, [hovered, speedTarget]);
-
-  return (
-    <div className="relative size-full">
-      {active && <OrbitClock phase={phase} blend={blend} wait={wait} speed={speed} />}
-      {children}
-      <OrbitalCharacterLayer planet={planet} phase={phase} blend={blend} />
-      <span className="sr-only">{planet.label}</span>
-    </div>
-  );
-}
-
-function DesktopPlanet({ planet, index, entered, active, orbitActive, clock, reduceMotion }) {
+function DesktopPlanet({ planet, index, entered, active, reduceMotion, onActivate }) {
   const [hovered, setHovered] = useState(false);
   const entryDelay = INTRO.planets[index];
+  const orbital = ORBITAL_PLANETS[planet.key];
+  const interactive = planet.key === "cambridge" || planet.key === "rayados";
+  const PlanetControl = interactive ? "button" : "div";
 
   return (
     <>
-      <div
-        className="absolute"
+      <PlanetControl
+        type={interactive ? "button" : undefined}
+        aria-label={interactive ? `Abrir ${planet.label}` : undefined}
+        aria-haspopup={interactive ? "dialog" : undefined}
+        className="absolute border-0 bg-transparent p-0 focus-visible:outline-none"
         style={{ left: pctX(planet.left), top: pctY(planet.top), width: cqw(planet.w), height: cqw(planet.h) }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        onFocus={interactive ? () => setHovered(true) : undefined}
+        onBlur={interactive ? () => setHovered(false) : undefined}
+        onClick={interactive ? (event) => onActivate(planet.key, event.currentTarget) : undefined}
       >
         <motion.div
           className="size-full"
@@ -460,37 +377,28 @@ function DesktopPlanet({ planet, index, entered, active, orbitActive, clock, red
             ? { delay: 0.04, duration: 0.16 }
             : { delay: entryDelay, duration: 0.48, ease: [0.2, 0.9, 0.25, 1.08] }}
         >
-          <AmbientFloat
-            clock={clock}
-            amount={active ? planet.floatAmount : 0}
-            duration={planet.floatDuration}
-            phase={planet.floatPhase}
+          <motion.div
+            className="size-full"
+            animate={{ scale: hovered && !reduceMotion ? 1.08 : 1 }}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
           >
-            <OrbitLabel planet={planet} active={orbitActive} hovered={hovered}>
-              <motion.div
-                className="relative z-[2] size-full"
-                animate={{ scale: hovered && !reduceMotion ? 1.04 : 1 }}
-                transition={{ duration: 0.3, ease: EASE_OUT }}
-              >
-                <Image
-                  src={planet.src}
-                  alt={planet.alt}
-                  fill
-                  preload
-                  sizes="10vw"
-                  className="object-contain"
-                  style={{
-                    filter: hovered && !reduceMotion
-                      ? `${PLANET_GLOW} drop-shadow(0 0 14px rgba(92, 218, 255, 0.72))`
-                      : PLANET_GLOW,
-                    transition: "filter 300ms cubic-bezier(0.16, 1, 0.3, 1)",
-                  }}
-                />
-              </motion.div>
-            </OrbitLabel>
-          </AmbientFloat>
+            <PlanetaOrbital
+              active={active}
+              label={planet.label}
+              texture={orbital.texture}
+              diameter={cqw(orbital.diameter)}
+              orbitRadius={cqw(orbital.orbitRadius)}
+              orbitDuration={orbital.orbitDuration}
+              orbitArc={orbital.orbitArc}
+              floatDuration={planet.key === "craft" ? 5 : planet.floatDuration}
+              floatOffset={cqw(planet.key === "craft" ? 3 : planet.floatAmount)}
+              fontSize={cqw(orbital.fontSize)}
+              glow={orbital.glow}
+              emphasized={hovered}
+            />
+          </motion.div>
         </motion.div>
-      </div>
+      </PlanetControl>
     </>
   );
 }
@@ -533,10 +441,52 @@ export default function Hero() {
   const entered = useInView(heroRef, { amount: 0.08, once: true });
   const reduceMotion = useReducedMotion();
   const [ambientReady, setAmbientReady] = useState(false);
+  const [planetOverlay, setPlanetOverlay] = useState(null);
+  const [planetOverlayPhase, setPlanetOverlayPhase] = useState("idle");
+  const planetTriggerRef = useRef(null);
   const clock = useMotionValue(0);
 
   const active = Boolean(isVisible && ambientReady && !reduceMotion);
-  const orbitActive = Boolean(entered && isVisible && !reduceMotion);
+
+  const openPlanetOverlay = useCallback((kind, trigger) => {
+    if (planetOverlayPhase !== "idle") return;
+
+    const rect = trigger.getBoundingClientRect();
+    planetTriggerRef.current = trigger;
+    setPlanetOverlay({
+      kind,
+      origin: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+      flight: {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+        src: ORBITAL_PLANETS[kind].texture,
+      },
+    });
+    setPlanetOverlayPhase("revealing");
+  }, [planetOverlayPhase]);
+
+  const closePlanetOverlay = useCallback(() => {
+    setPlanetOverlayPhase((current) => (
+      current === "idle" || current === "closing" ? current : "closing"
+    ));
+  }, []);
+
+  const finishPlanetOverlayClose = useCallback(() => {
+    setPlanetOverlayPhase("idle");
+    setPlanetOverlay(null);
+    requestAnimationFrame(() => planetTriggerRef.current?.focus({ preventScroll: true }));
+  }, []);
+
+  useEffect(() => {
+    if (!planetOverlay) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [planetOverlay]);
 
   return (
     <section ref={heroRef} id="top" data-nav-theme="dark" className="relative overflow-hidden bg-[#f7f5f0]">
@@ -655,9 +605,8 @@ export default function Hero() {
             index={index}
             entered={entered}
             active={active}
-            orbitActive={orbitActive}
-            clock={clock}
             reduceMotion={reduceMotion}
+            onActivate={openPlanetOverlay}
           />
         ))}
 
@@ -803,25 +752,45 @@ export default function Hero() {
           </motion.span>
 
           <div className="mt-8 flex items-center justify-center gap-4">
-            {[PLANETS[1], PLANETS[0], PLANETS[2], PLANETS[3]].map((p, index) => (
-              <motion.div
-                key={p.key}
-                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.75 }}
-                animate={entered ? { opacity: 1, scale: 1 } : undefined}
-                transition={{ delay: reduceMotion ? 0.03 : INTRO.planets[index], duration: reduceMotion ? 0.16 : 0.42, ease: EASE_OUT }}
-              >
-                <AmbientFloat clock={clock} amount={active ? Math.min(3, p.floatAmount) : 0} duration={p.floatDuration} phase={p.floatPhase}>
-                  <Image
-                    src={p.src}
-                    alt={p.alt}
-                    width={64}
-                    height={64}
-                    className="h-10 w-10 sm:h-14 sm:w-14 object-contain"
-                    style={{ filter: PLANET_GLOW }}
-                  />
-                </AmbientFloat>
-              </motion.div>
-            ))}
+            {[PLANETS[1], PLANETS[0], PLANETS[2], PLANETS[3]].map((p, index) => {
+              const orbital = ORBITAL_PLANETS[p.key];
+              const radiusRatio = orbital.orbitRadius / orbital.diameter;
+              const fontRatio = orbital.fontSize / orbital.diameter;
+              const interactive = p.key === "cambridge" || p.key === "rayados";
+              const MobilePlanetControl = interactive ? motion.button : motion.div;
+
+              return (
+                <MobilePlanetControl
+                  key={p.key}
+                  type={interactive ? "button" : undefined}
+                  aria-label={interactive ? `Abrir ${p.label}` : undefined}
+                  aria-haspopup={interactive ? "dialog" : undefined}
+                  onClick={interactive ? (event) => openPlanetOverlay(p.key, event.currentTarget) : undefined}
+                  whileHover={interactive && !reduceMotion ? { scale: 1.08 } : undefined}
+                  whileTap={interactive && !reduceMotion ? { scale: 0.96 } : undefined}
+                  className="border-0 bg-transparent p-0 focus-visible:rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.75 }}
+                  animate={entered ? { opacity: 1, scale: 1 } : undefined}
+                  transition={{ delay: reduceMotion ? 0.03 : INTRO.planets[index], duration: reduceMotion ? 0.16 : 0.42, ease: EASE_OUT }}
+                >
+                  <div className="h-10 w-10 sm:h-14 sm:w-14">
+                    <PlanetaOrbital
+                      active={active}
+                      label={p.label}
+                      texture={orbital.texture}
+                      diameter="clamp(40px, 7vw, 56px)"
+                      orbitRadius={`clamp(${(40 * radiusRatio).toFixed(2)}px, ${(7 * radiusRatio).toFixed(3)}vw, ${(56 * radiusRatio).toFixed(2)}px)`}
+                      orbitDuration={orbital.orbitDuration}
+                      orbitArc={orbital.orbitArc}
+                      floatDuration={p.key === "craft" ? 5 : p.floatDuration}
+                      floatOffset="clamp(1px, 0.2vw, 2px)"
+                      fontSize={`clamp(${Math.max(6, 40 * fontRatio).toFixed(2)}px, ${Math.max(1, 7 * fontRatio).toFixed(3)}vw, ${Math.max(8, 56 * fontRatio).toFixed(2)}px)`}
+                      glow={orbital.glow}
+                    />
+                  </div>
+                </MobilePlanetControl>
+              );
+            })}
           </div>
 
           <div className="relative mt-2 flex justify-center">
@@ -887,6 +856,24 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      {planetOverlay && planetOverlayPhase !== "idle" && (
+        <CircularCurtainOverlay
+          phase={planetOverlayPhase}
+          origin={planetOverlay.origin}
+          flight={planetOverlay.flight}
+          reduceMotion={reduceMotion}
+          ariaLabel={planetOverlay.kind === "cambridge" ? "Cambridge English" : "Escuela Oficial Rayados de Monterrey"}
+          closeAriaLabel={planetOverlay.kind === "cambridge" ? "Cerrar Cambridge English" : "Cerrar Escuela Oficial Rayados"}
+          onClose={closePlanetOverlay}
+          onFlightComplete={() => {}}
+          onOpened={() => setPlanetOverlayPhase((current) => (current === "revealing" ? "open" : current))}
+          onClosed={finishPlanetOverlayClose}
+          showFlight={false}
+        >
+          {planetOverlay.kind === "cambridge" ? <Cambridge /> : <Rayados />}
+        </CircularCurtainOverlay>
+      )}
     </section>
   );
 }

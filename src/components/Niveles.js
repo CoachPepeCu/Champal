@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import TierraGiratoria from "@/components/hero/TierraGiratoria";
 
 // Réplica 1:1 de Figma para "03_niveles" (node 817:976, canvas 1440x772) —
 // va pegada justo después de 02_Comunidad. Misma técnica que Comunidad.js:
@@ -343,8 +344,8 @@ export default function Niveles() {
                 <div className="absolute" style={{ left: cqw(597 - 30), top: ihsPctY(-60 - 30), width: cqw(320), height: cqw(320) }}>
                   <Image src="/images/niveles/glow-ellipse.svg" alt="" fill sizes="22vw" className="object-contain" />
                 </div>
-                <div className="absolute" style={{ left: cqw(592), top: ihsPctY(-58), width: cqw(267), height: cqw(265) }}>
-                  <Image src="/images/niveles/globo-mundo.png" alt="Globo terráqueo" fill sizes="19vw" className="object-contain" />
+                <div className="absolute flex items-center justify-center" style={{ left: cqw(592), top: ihsPctY(-58), width: cqw(267), height: cqw(265) }}>
+                  <TierraGiratoria size="100%" duration={18} />
                 </div>
 
                 <div className="absolute rounded-sm" style={{ left: cqw(99), top: ihsPctY(74 + PANEL_SHIFT), width: cqw(56), height: cqw(6), backgroundColor: "#df3035" }} />
@@ -435,9 +436,9 @@ export default function Niveles() {
             Doble certificado, misma formación humana.
           </p>
 
-          <div className="relative mx-auto mt-8 h-52 w-52">
+          <div className="relative mx-auto mt-8 flex h-52 w-52 items-center justify-center">
             <Image src="/images/niveles/glow-ellipse.svg" alt="" fill sizes="40vw" className="object-contain" />
-            <Image src="/images/niveles/globo-mundo.png" alt="Globo terráqueo" fill sizes="40vw" className="object-contain" />
+            <TierraGiratoria size="100%" duration={18} />
           </div>
 
           <p

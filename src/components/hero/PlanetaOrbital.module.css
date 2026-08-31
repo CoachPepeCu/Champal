@@ -1,0 +1,121 @@
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  perspective: calc(var(--planet-diameter) * 5.5);
+  transform-style: preserve-3d;
+  pointer-events: none;
+  animation: planet-float var(--planet-float-duration) ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.active {
+  animation-play-state: running;
+}
+
+.planet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--planet-diameter);
+  height: var(--planet-diameter);
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: #1a2a4a;
+  box-shadow:
+    0 0 22px rgb(0 0 0 / 72%),
+    0 0 18px var(--planet-glow);
+  transform: translate(-50%, -50%) translateZ(0);
+  transform-style: preserve-3d;
+  transition: box-shadow 280ms ease;
+}
+
+.texture {
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+
+.emphasized .planet {
+  box-shadow:
+    0 0 12px 2px rgb(255 255 255 / 72%),
+    0 0 27px 7px rgb(92 190 255 / 54%),
+    0 0 48px 11px rgb(48 135 255 / 24%);
+}
+
+.emphasized .letter {
+  text-shadow:
+    0 2px 6px rgb(0 0 0 / 90%),
+    0 0 7px rgb(255 255 255 / 70%),
+    0 0 12px rgb(92 190 255 / 48%);
+}
+
+.planet::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  border-radius: inherit;
+  box-shadow:
+    inset 18px -10px 30px rgb(0 0 0 / 85%),
+    inset -10px 10px 20px rgb(255 255 255 / 20%);
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  transform-style: preserve-3d;
+  animation: planet-orbit var(--planet-orbit-duration) linear infinite;
+  animation-play-state: paused;
+}
+
+.active .ring {
+  animation-play-state: running;
+}
+
+.letter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: calc(var(--planet-font-size) * -0.5);
+  margin-left: calc(var(--planet-font-size) * -0.32);
+  color: #fff;
+  font-family: var(--font-outfit), Outfit, sans-serif;
+  font-size: var(--planet-font-size);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow:
+    0 2px 6px rgb(0 0 0 / 90%),
+    0 0 5px var(--planet-glow);
+  white-space: pre;
+  backface-visibility: hidden;
+  transform: rotateY(var(--letter-angle)) translateZ(var(--planet-orbit-radius));
+}
+
+@keyframes planet-orbit {
+  from {
+    transform: rotateY(0deg);
+  }
+
+  to {
+    transform: rotateY(-360deg);
+  }
+}
+
+@keyframes planet-float {
+  from {
+    transform: translateY(calc(-1 * var(--planet-float-offset)));
+  }
+
+  to {
+    transform: translateY(var(--planet-float-offset));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene,
+  .ring {
+    animation: none;
+  }
+}
