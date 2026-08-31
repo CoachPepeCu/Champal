@@ -36,7 +36,7 @@ const BAR_BACKGROUND = "rgba(10, 37, 64, 0.82)";
 const LOGO_GLASS_GRADIENT =
   "linear-gradient(90deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.9) 68%, rgba(255,255,255,0) 100%)";
 
-const PLATAFORMA_HREF = "/#nosotros";
+const PLATAFORMA_HREF = "https://web11.servoescolar.mx/login.aspx";
 
 // Old CTA, toggled off per earlier client request — keep the markup, just don't render it.
 const SHOW_CTA_BUTTON = false;
