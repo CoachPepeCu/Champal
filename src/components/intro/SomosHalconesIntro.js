@@ -12,8 +12,7 @@ const varsity = localFont({ src: "../../fonts/varsity-regular.ttf" });
 const meowScript = Meow_Script({ subsets: ["latin"], weight: "400" });
 
 const HALCON_PATH_COUNT = 123;
-const INTRO_DURATION = 5300;
-const EXIT_DURATION = 700;
+const INTRO_DURATION = 7150;
 
 // Fisher-Yates con LCG de semilla fija: idéntico en servidor, cliente y replay.
 function deterministicOrder(length, seed = 12891303) {
@@ -50,6 +49,9 @@ export default function SomosHalconesIntro({
   const skipRef = useRef(null);
   const previousFocusRef = useRef(null);
   const timersRef = useRef([]);
+  const skippedRef = useRef(false);
+  const completionReportedRef = useRef(false);
+  const visibleStage = stage === "playing";
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(window.clearTimeout);
@@ -57,26 +59,37 @@ export default function SomosHalconesIntro({
   }, []);
 
   const finish = useCallback((skipped = false) => {
+    skippedRef.current ||= skipped;
     clearTimers();
-    setStage(skipped ? "skipped" : "complete");
-    if (skipped) onSkip?.();
+    setStage(skippedRef.current ? "skipped" : "complete");
+  }, [clearTimers]);
+
+  const reportCompletion = useCallback(() => {
+    if (completionReportedRef.current) return;
+    completionReportedRef.current = true;
+    if (skippedRef.current) onSkip?.();
     onComplete?.();
     requestAnimationFrame(() => previousFocusRef.current?.focus?.({ preventScroll: true }));
-  }, [clearTimers, onComplete, onSkip]);
+  }, [onComplete, onSkip]);
 
   const start = useCallback(() => {
     clearTimers();
+    skippedRef.current = false;
+    completionReportedRef.current = false;
     setRun((value) => value + 1);
     setStage("playing");
   }, [clearTimers]);
 
   useEffect(() => {
     previousFocusRef.current = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     skipRef.current?.focus({ preventScroll: true });
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = previousBodyOverflow;
       clearTimers();
       previousFocusRef.current?.focus?.({ preventScroll: true });
     };
@@ -90,21 +103,10 @@ export default function SomosHalconesIntro({
       return clearTimers;
     }
 
-    const closing = window.setTimeout(() => setStage("closing"), INTRO_DURATION - EXIT_DURATION);
-    timersRef.current = [closing];
-    return clearTimers;
-  }, [clearTimers, finish, reduceMotion, run, stage]);
-
-  useEffect(() => {
-    if (stage !== "closing") return undefined;
-    const completed = window.setTimeout(() => finish(false), EXIT_DURATION);
+    const completed = window.setTimeout(() => finish(false), INTRO_DURATION);
     timersRef.current = [completed];
     return clearTimers;
-  }, [clearTimers, finish, stage]);
-
-  useEffect(() => {
-    if (stage === "skipped" || (stage === "complete" && !reduceMotion)) document.body.style.overflow = "";
-  }, [reduceMotion, stage]);
+  }, [clearTimers, finish, reduceMotion, run, stage]);
 
   useEffect(() => {
     const object = falconRef.current;
@@ -140,7 +142,7 @@ export default function SomosHalconesIntro({
 
       paths.forEach((path, index) => {
         const rank = PIECE_RANK[index];
-        path.style.setProperty("--piece-delay", `${2400 + rank * 11 + ((rank * 17) % 9)}ms`);
+        path.style.setProperty("--piece-delay", `${4900 + rank * 11 + ((rank * 17) % 9)}ms`);
         path.style.setProperty("--piece-x", `${((index * 11) % 9) - 4}px`);
         path.style.setProperty("--piece-y", `${((index * 7) % 11) - 5}px`);
         path.style.setProperty("--piece-r", `${((index * 13) % 7) - 3}deg`);
@@ -149,27 +151,32 @@ export default function SomosHalconesIntro({
       const group = svgDocument.getElementById("Halcon");
       group.classList.remove("intro-assemble");
       void group.getBoundingClientRect();
-      if (!reduceMotion && stage !== "complete") group.classList.add("intro-assemble");
+      if (!reduceMotion) group.classList.add("intro-assemble");
+      object.dataset.ready = "true";
     };
 
     object.addEventListener("load", prepareSvg);
     prepareSvg();
-    return () => object.removeEventListener("load", prepareSvg);
-  }, [reduceMotion, run, stage]);
+    return () => {
+      object.removeEventListener("load", prepareSvg);
+      delete object.dataset.ready;
+    };
+  }, [reduceMotion, run]);
 
   const handleKeyDown = useCallback((event) => {
     if (event.key === "Escape" && stage !== "complete") {
       event.preventDefault();
       finish(true);
+    } else if (event.key === "Tab" && visibleStage) {
+      event.preventDefault();
+      skipRef.current?.focus({ preventScroll: true });
     }
-  }, [finish, stage]);
+  }, [finish, stage, visibleStage]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
-
-  const visibleStage = stage === "playing" || stage === "closing" || (reduceMotion && stage === "complete");
 
   return (
     <main className={styles.page} data-stage={stage} data-run={run}>
@@ -177,7 +184,7 @@ export default function SomosHalconesIntro({
         <span>HOME Champal</span>
       </div>
 
-      <AnimatePresence initial={false}>
+      <AnimatePresence onExitComplete={reportCompletion}>
         {visibleStage && (
           <motion.section
             key={run}
@@ -185,7 +192,7 @@ export default function SomosHalconesIntro({
             aria-label="Introducción Somos Halcones"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0.01 : 0.15 }}
+            transition={{ duration: 0.01 }}
           >
             <motion.div
               className={styles.scene}
@@ -243,15 +250,6 @@ export default function SomosHalconesIntro({
               transition={{ delay: reduceMotion ? 0 : 0.42, duration: reduceMotion ? 0.01 : 0.76, ease: [0.76, 0, 0.24, 1] }}
             />
 
-            {stage === "closing" && (
-              <motion.div
-                className={styles.closingCurtain}
-                aria-hidden="true"
-                initial={{ clipPath: "circle(0 at 50% 50%)" }}
-                animate={{ clipPath: "circle(150vmax at 50% 50%)" }}
-                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-              />
-            )}
           </motion.section>
         )}
       </AnimatePresence>
