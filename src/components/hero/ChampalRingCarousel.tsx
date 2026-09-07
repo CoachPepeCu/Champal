@@ -593,8 +593,7 @@ export default function ChampalRingCarousel() {
       style={{
         position: "relative",
         width: "100%",
-        height: "100svh",
-        minHeight: "760px",
+        height: "100vh",
         overflow: "hidden",
         backgroundImage: 'url("/images/Fondo Azul Cuadrícula.webp")',
         backgroundSize: "cover",
@@ -686,7 +685,7 @@ export default function ChampalRingCarousel() {
         style={{
           position: "absolute",
           left: "50%",
-          top: "13px",
+          top: "clamp(-52px, calc(13px - (760px - 100vh) * 0.55), 13px)",
           transform: "translateX(-50%)",
           width: "min(1040px, 72vw)",
           height: "650px",
