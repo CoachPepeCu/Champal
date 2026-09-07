@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import gsap from "gsap"
 
 interface RoundCarouselImage {
@@ -99,21 +99,21 @@ function ValueCard({
       className={`champal-value-card champal-value-${side}`}
       data-row={row}
       style={{
-        width: "198px",
+        width: "var(--value-card-width, 198px)",
         transformStyle: "preserve-3d",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "9px",
+        gap: "var(--value-gap, 9px)",
       }}
     >
       <div
         style={{
           position: "relative",
-          width: "100px",
-          height: "100px",
+          width: "var(--value-icon-size, 100px)",
+          height: "var(--value-icon-size, 100px)",
           border: "2px solid rgba(255,255,255,0.96)",
-          borderRadius: "10px",
+          borderRadius: "var(--value-radius, 10px)",
           overflow: "hidden",
           boxShadow: "0 4px 5px rgba(0,0,0,0.30)",
         }}
@@ -139,7 +139,7 @@ function ValueCard({
         style={{
           position: "relative",
           width: "100%",
-          minHeight: "28px",
+          minHeight: "var(--value-label-height, 28px)",
           padding: "2px 10px 3px",
           borderRadius: "12px",
           display: "flex",
@@ -159,9 +159,9 @@ function ValueCard({
             width: "100%",
             color: "rgba(255,255,255,0.92)",
             fontFamily: "'Fredoka One', Fredoka, sans-serif",
-            fontSize: "14px",
+            fontSize: "var(--value-font-size, 14px)",
             fontWeight: 400,
-            lineHeight: "22px",
+            lineHeight: "var(--value-line-height, 22px)",
             textAlign: "center",
             whiteSpace: "nowrap",
           }}
@@ -183,11 +183,11 @@ function ValueColumn({
   return (
     <div
       style={{
-        width: "198px",
+        width: "var(--value-card-width, 198px)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "28px",
+        gap: "var(--column-gap, 28px)",
         perspective: "1200px",
         perspectiveOrigin: "50% 50%",
       }}
@@ -406,10 +406,10 @@ function DateBracket() {
       style={{
         position: "absolute",
         left: "50%",
-        bottom: "18px",
+        bottom: "calc(18px * var(--date-scale, 1))",
         transform: "translateX(-50%)",
-        width: "258px",
-        height: "66px",
+        width: "calc(258px * var(--date-scale, 1))",
+        height: "calc(66px * var(--date-scale, 1))",
         color: "#fff",
         zIndex: 40,
       }}
@@ -420,8 +420,8 @@ function DateBracket() {
           position: "absolute",
           left: 0,
           top: 0,
-          width: "38px",
-          height: "65px",
+          width: "calc(38px * var(--date-scale, 1))",
+          height: "calc(65px * var(--date-scale, 1))",
           borderLeft: "3px solid rgba(255,255,255,0.96)",
           borderTop: "3px solid rgba(255,255,255,0.96)",
           borderBottom: "3px solid rgba(255,255,255,0.96)",
@@ -434,8 +434,8 @@ function DateBracket() {
           position: "absolute",
           right: 0,
           top: 0,
-          width: "38px",
-          height: "65px",
+          width: "calc(38px * var(--date-scale, 1))",
+          height: "calc(65px * var(--date-scale, 1))",
           borderRight: "3px solid rgba(255,255,255,0.96)",
           borderTop: "3px solid rgba(255,255,255,0.96)",
           borderBottom: "3px solid rgba(255,255,255,0.96)",
@@ -448,14 +448,14 @@ function DateBracket() {
           left: "50%",
           top: "2px",
           transform: "translateX(-50%)",
-          width: "170px",
+          width: "calc(170px * var(--date-scale, 1))",
           textAlign: "center",
         }}
       >
         <div
           style={{
             fontFamily: "Outfit, sans-serif",
-            fontSize: "24px",
+            fontSize: "calc(24px * var(--date-scale, 1))",
             fontWeight: 400,
             lineHeight: 1.02,
             textTransform: "uppercase",
@@ -468,7 +468,7 @@ function DateBracket() {
           style={{
             marginTop: "4px",
             fontFamily: "Fredoka, sans-serif",
-            fontSize: "32px",
+            fontSize: "calc(32px * var(--date-scale, 1))",
             fontWeight: 600,
             lineHeight: 1,
           }}
@@ -484,8 +484,26 @@ export default function ChampalRingCarousel() {
   const images = useMemo(() => CAROUSEL_IMAGES, [])
   const [selected, setSelected] = useState<number | null>(null)
   const [carouselRunning, setCarouselRunning] = useState(true)
+  const [layoutScale, setLayoutScale] = useState(0.72)
 
   const sectionRef = useRef<HTMLElement | null>(null)
+
+  useLayoutEffect(() => {
+    const updateLayout = () => {
+      const width = window.innerWidth
+      const height = window.innerHeight
+
+      // Escala de TAMAÑOS, no de coordenadas ni del escenario completo.
+      // 0.72 reproduce la proporción visual aprobada; baja un poco más
+      // en ventanas realmente pequeñas/bajas.
+      const fit = Math.min(width / 1440, height / 760)
+      setLayoutScale(Math.max(0.58, Math.min(0.72, fit * 0.72)))
+    }
+
+    updateLayout()
+    window.addEventListener("resize", updateLayout)
+    return () => window.removeEventListener("resize", updateLayout)
+  }, [])
 
   useEffect(() => {
     if (!sectionRef.current) return
@@ -604,13 +622,13 @@ export default function ChampalRingCarousel() {
       <div
         style={{
           position: "absolute",
-          top: "43px",
-          left: "clamp(46px, 6vw, 87px)",
-          right: "46px",
-          height: "91px",
+          top: `${Math.round(43 * layoutScale)}px`,
+          left: `${Math.round(87 * layoutScale)}px`,
+          right: `${Math.round(46 * layoutScale)}px`,
+          height: `${Math.round(91 * layoutScale)}px`,
           display: "flex",
           alignItems: "center",
-          gap: "24px",
+          gap: `${Math.round(24 * layoutScale)}px`,
           zIndex: 30,
         }}
       >
@@ -618,8 +636,8 @@ export default function ChampalRingCarousel() {
           className="champal-red-bar"
           aria-hidden="true"
           style={{
-            width: "15px",
-            height: "91px",
+            width: `${Math.max(9, Math.round(15 * layoutScale))}px`,
+            height: `${Math.round(91 * layoutScale)}px`,
             flex: "0 0 auto",
             background: "#DA2028",
           }}
@@ -630,7 +648,7 @@ export default function ChampalRingCarousel() {
             margin: 0,
             color: "#fff",
             fontFamily: "Fredoka, sans-serif",
-            fontSize: "clamp(36px, 3.34vw, 48px)",
+            fontSize: `${Math.round(48 * layoutScale)}px`,
             fontWeight: 600,
             lineHeight: 1,
             whiteSpace: "nowrap",
@@ -659,10 +677,18 @@ export default function ChampalRingCarousel() {
       <div
         style={{
           position: "absolute",
-          left: "calc(clamp(32px, 3.2vw, 46px) + 152px)",
-          top: "208px",
+          left: `${Math.max(72, Math.round(170 * layoutScale))}px`,
+          top: `${Math.round(190 * layoutScale)}px`,
           zIndex: 18,
-        }}
+          ["--value-card-width" as string]: `${Math.round(198 * layoutScale * 1.16)}px`,
+          ["--value-icon-size" as string]: `${Math.round(116 * layoutScale)}px`,
+          ["--value-gap" as string]: `${Math.max(5, Math.round(9 * layoutScale))}px`,
+          ["--value-radius" as string]: `${Math.max(6, Math.round(10 * layoutScale))}px`,
+          ["--value-label-height" as string]: `${Math.round(28 * layoutScale * 1.16)}px`,
+          ["--value-font-size" as string]: `${Math.max(11, Math.round(15 * layoutScale))}px`,
+          ["--value-line-height" as string]: `${Math.max(16, Math.round(23 * layoutScale))}px`,
+          ["--column-gap" as string]: `${Math.round(46 * layoutScale)}px`,
+        } as React.CSSProperties}
       >
         <ValueColumn values={LEFT_VALUES} side="left" />
       </div>
@@ -670,10 +696,18 @@ export default function ChampalRingCarousel() {
       <div
         style={{
           position: "absolute",
-          right: "calc(clamp(32px, 4.3vw, 62px) + 152px)",
-          top: "208px",
+          right: `${Math.max(72, Math.round(170 * layoutScale))}px`,
+          top: `${Math.round(190 * layoutScale)}px`,
           zIndex: 18,
-        }}
+          ["--value-card-width" as string]: `${Math.round(198 * layoutScale * 1.16)}px`,
+          ["--value-icon-size" as string]: `${Math.round(116 * layoutScale)}px`,
+          ["--value-gap" as string]: `${Math.max(5, Math.round(9 * layoutScale))}px`,
+          ["--value-radius" as string]: `${Math.max(6, Math.round(10 * layoutScale))}px`,
+          ["--value-label-height" as string]: `${Math.round(28 * layoutScale * 1.16)}px`,
+          ["--value-font-size" as string]: `${Math.max(11, Math.round(15 * layoutScale))}px`,
+          ["--value-line-height" as string]: `${Math.max(16, Math.round(23 * layoutScale))}px`,
+          ["--column-gap" as string]: `${Math.round(46 * layoutScale)}px`,
+        } as React.CSSProperties}
       >
         <ValueColumn values={RIGHT_VALUES} side="right" />
       </div>
@@ -685,18 +719,18 @@ export default function ChampalRingCarousel() {
         style={{
           position: "absolute",
           left: "50%",
-          top: "clamp(-52px, calc(13px - (760px - 100vh) * 0.55), 13px)",
+          top: `${Math.round(-12 * layoutScale)}px`,
           transform: "translateX(-50%)",
-          width: "min(1040px, 72vw)",
-          height: "650px",
+          width: `${Math.round(1040 * layoutScale * 1.08)}px`,
+          height: `${Math.round(650 * layoutScale * 1.08)}px`,
           zIndex: 4,
           pointerEvents: "auto",
         }}
       >
         <RoundCarousel
           images={images}
-          imageWidth={340}
-          imageHeight={340}
+          imageWidth={Math.round(340 * layoutScale * 1.08)}
+          imageHeight={Math.round(340 * layoutScale * 1.08)}
           spacing={1.15}
           speed={2.4}
           direction="right"
@@ -712,7 +746,17 @@ export default function ChampalRingCarousel() {
         />
       </div>
 
-      <DateBracket />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          ["--date-scale" as string]: layoutScale,
+          pointerEvents: "none",
+          zIndex: 40,
+        } as React.CSSProperties}
+      >
+        <DateBracket />
+      </div>
 
       {selected !== null && images[selected] && (
         <div
