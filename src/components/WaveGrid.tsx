@@ -1068,7 +1068,7 @@ export interface WaveGridProps {
     style?: React.CSSProperties
 }
 
-function __OriginkitBase_WaveGrid(props: WaveGridProps) {
+function OriginkitBaseWaveGrid(props: WaveGridProps) {
     const {
         base = DEFAULTS.base,
         crest = DEFAULTS.crest,
@@ -1087,8 +1087,7 @@ function __OriginkitBase_WaveGrid(props: WaveGridProps) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const sceneRef = useRef<WaveGridScene | null>(null)
 
-    const cfgRef = useRef<Config>(null as any)
-    cfgRef.current = {
+    const cfgRef = useRef<Config>({
         base,
         crest,
         grid,
@@ -1099,7 +1098,7 @@ function __OriginkitBase_WaveGrid(props: WaveGridProps) {
         tilt,
         shadows,
         sizePercent,
-    }
+    })
 
     useEffect(() => {
         const container = containerRef.current
@@ -1127,6 +1126,18 @@ function __OriginkitBase_WaveGrid(props: WaveGridProps) {
     }, [])
 
     useEffect(() => {
+        cfgRef.current = {
+            base,
+            crest,
+            grid,
+            gap,
+            amplitude,
+            waveSpeed,
+            trail,
+            tilt,
+            shadows,
+            sizePercent,
+        }
         sceneRef.current?.updateConfig(cfgRef.current)
     }, [
         base,
@@ -1182,5 +1193,5 @@ const __originkitPresetProps = {
 };
 
 export default function WaveGrid(props: Record<string, unknown>) {
-  return <__OriginkitBase_WaveGrid {...(__originkitPresetProps as Record<string, unknown>)} {...props} />;
+  return <OriginkitBaseWaveGrid {...(__originkitPresetProps as Record<string, unknown>)} {...props} />;
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import Image from "next/image"
 import gsap from "gsap"
 
 interface RoundCarouselImage {
@@ -30,7 +31,6 @@ interface RoundCarouselProps {
 type ValueItem = {
   label: string
   src: string
-  figmaFallback: string
 }
 
 const CAROUSEL_IMAGES: RoundCarouselImage[] = Array.from(
@@ -41,164 +41,79 @@ const CAROUSEL_IMAGES: RoundCarouselImage[] = Array.from(
   }),
 )
 
-const LEFT_VALUES: ValueItem[] = [
+const VALUES: ValueItem[] = [
   {
-    label: "CIUDADANÍA GLOBAL",
-    src: "/images/hero/Prin Ciudadania.webp",
-    figmaFallback:
-      "https://www.figma.com/api/mcp/asset/1fe4a9a0-a339-4000-9d5a-8d46b17d158f.png",
+    label: "Integridad",
+    src: "/images/Valores/Azul 3D Integridad.webp",
   },
   {
-    label: "COMPASIÓN",
-    src: "/images/hero/Prin Compasion.webp",
-    figmaFallback:
-      "https://www.figma.com/api/mcp/asset/46412f3d-ac43-41b6-a884-c0c4583f4b36.png",
+    label: "Hermandad",
+    src: "/images/Valores/Azul 3D Hermandad.webp",
   },
   {
-    label: "COMPROMISO",
-    src: "/images/hero/Prin Compromiso.webp",
-    figmaFallback:
-      "https://www.figma.com/api/mcp/asset/e5756e54-be01-48fd-8922-4ca98d821fc7.png",
-  },
-]
-
-const RIGHT_VALUES: ValueItem[] = [
-  {
-    label: "EXCELENCIA ACADÉMICA",
-    src: "/images/hero/Prin Excelencia.webp",
-    figmaFallback:
-      "https://www.figma.com/api/mcp/asset/6ac86405-9ee5-460f-bcfd-1ff21e11baf7.png",
+    label: "Excelencia académica",
+    src: "/images/Valores/Azul 3D Excelencia.webp",
   },
   {
-    label: "INTEGRIDAD",
-    src: "/images/hero/Prin Integridad.webp",
-    figmaFallback:
-      "https://www.figma.com/api/mcp/asset/1884682a-2f38-48c5-bc21-16fef6c4271f.png",
+    label: "Compromiso",
+    src: "/images/Valores/Azul 3D Compromiso.webp",
   },
   {
-    label: "HERMANDAD",
-    src: "/images/hero/Prin Hermandad.webp",
-    figmaFallback:
-      "https://www.figma.com/api/mcp/asset/1bf8d09a-731d-4713-a235-d655da3f5f74.png",
+    label: "Compasión",
+    src: "/images/Valores/Azul 3D Compasion.webp",
+  },
+  {
+    label: "Ciudadanía global",
+    src: "/images/Valores/Azul 3D Ciudadanía.webp",
   },
 ]
 
-function ValueCard({
-  item,
-  side,
-  row,
-}: {
-  item: ValueItem
-  side: "left" | "right"
-  row: number
-}) {
-  const [fallbackUsed, setFallbackUsed] = useState(false)
-
+function ValueCard({ item }: { item: ValueItem }) {
   return (
     <div
-      className={`champal-value-card champal-value-${side}`}
-      data-row={row}
+      className="champal-value-card"
       style={{
-        width: "var(--value-card-width, 198px)",
+        position: "relative",
+        width: 150,
+        height: 150,
         transformStyle: "preserve-3d",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "var(--value-gap, 9px)",
+        overflow: "hidden",
+        border: "1px solid rgba(255,255,255,0.9)",
+        borderRadius: 11,
+        boxShadow: "0 8px 18px rgba(0,0,0,0.28)",
+        opacity: 0,
+        transform: "translateY(190px) scale(0.96)",
+        transformOrigin: "50% 100%",
+        willChange: "transform, opacity",
       }}
-    >
-      <div
-        style={{
-          position: "relative",
-          width: "var(--value-icon-size, 100px)",
-          height: "var(--value-icon-size, 100px)",
-          border: "2px solid rgba(255,255,255,0.96)",
-          borderRadius: "var(--value-radius, 10px)",
-          overflow: "hidden",
-          boxShadow: "0 4px 5px rgba(0,0,0,0.30)",
-        }}
       >
-        <img
-          src={fallbackUsed ? item.figmaFallback : item.src}
-          alt=""
-          onError={() => {
-            if (!fallbackUsed) setFallbackUsed(true)
-          }}
+        <Image
+          src={item.src}
+          alt={item.label}
           draggable={false}
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "block",
-            objectFit: "cover",
-            borderRadius: "8px",
-          }}
+          fill
+          sizes="150px"
+          style={{ objectFit: "cover" }}
         />
-      </div>
-
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          minHeight: "var(--value-label-height, 28px)",
-          padding: "2px 10px 3px",
-          borderRadius: "12px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-          background: "rgba(255,255,255,0.10)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
-          border: "1px solid rgba(255,255,255,0.14)",
-          boxShadow:
-            "inset 0 4px 4px rgba(0,0,0,0.25), 0 5px 16px rgba(0,0,0,0.08)",
-        }}
-      >
-        <span
-          style={{
-            width: "100%",
-            color: "rgba(255,255,255,0.92)",
-            fontFamily: "'Fredoka One', Fredoka, sans-serif",
-            fontSize: "var(--value-font-size, 14px)",
-            fontWeight: 400,
-            lineHeight: "var(--value-line-height, 22px)",
-            textAlign: "center",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {item.label}
-        </span>
-      </div>
     </div>
   )
 }
 
-function ValueColumn({
-  values,
-  side,
-}: {
-  values: ValueItem[]
-  side: "left" | "right"
-}) {
+function ValueRow() {
   return (
     <div
       style={{
-        width: "var(--value-card-width, 198px)",
+        position: "relative",
+        width: 1250,
+        height: 150,
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "var(--column-gap, 28px)",
+        justifyContent: "space-between",
         perspective: "1200px",
         perspectiveOrigin: "50% 50%",
       }}
     >
-      {values.map((item, row) => (
-        <ValueCard
-          key={item.label}
-          item={item}
-          side={side}
-          row={row}
-        />
+      {VALUES.map((item) => (
+        <ValueCard key={item.label} item={item} />
       ))}
     </div>
   )
@@ -406,10 +321,10 @@ function DateBracket() {
       style={{
         position: "absolute",
         left: "50%",
-        bottom: "calc(18px * var(--date-scale, 1))",
+        top: 0,
         transform: "translateX(-50%)",
-        width: "calc(258px * var(--date-scale, 1))",
-        height: "calc(66px * var(--date-scale, 1))",
+        width: 258,
+        height: 66,
         color: "#fff",
         zIndex: 40,
       }}
@@ -420,8 +335,8 @@ function DateBracket() {
           position: "absolute",
           left: 0,
           top: 0,
-          width: "calc(38px * var(--date-scale, 1))",
-          height: "calc(65px * var(--date-scale, 1))",
+          width: 38,
+          height: 65,
           borderLeft: "3px solid rgba(255,255,255,0.96)",
           borderTop: "3px solid rgba(255,255,255,0.96)",
           borderBottom: "3px solid rgba(255,255,255,0.96)",
@@ -434,8 +349,8 @@ function DateBracket() {
           position: "absolute",
           right: 0,
           top: 0,
-          width: "calc(38px * var(--date-scale, 1))",
-          height: "calc(65px * var(--date-scale, 1))",
+          width: 38,
+          height: 65,
           borderRight: "3px solid rgba(255,255,255,0.96)",
           borderTop: "3px solid rgba(255,255,255,0.96)",
           borderBottom: "3px solid rgba(255,255,255,0.96)",
@@ -448,14 +363,14 @@ function DateBracket() {
           left: "50%",
           top: "2px",
           transform: "translateX(-50%)",
-          width: "calc(170px * var(--date-scale, 1))",
+          width: 170,
           textAlign: "center",
         }}
       >
         <div
           style={{
             fontFamily: "Outfit, sans-serif",
-            fontSize: "calc(24px * var(--date-scale, 1))",
+            fontSize: 24,
             fontWeight: 400,
             lineHeight: 1.02,
             textTransform: "uppercase",
@@ -468,7 +383,7 @@ function DateBracket() {
           style={{
             marginTop: "4px",
             fontFamily: "Fredoka, sans-serif",
-            fontSize: "calc(32px * var(--date-scale, 1))",
+            fontSize: 32,
             fontWeight: 600,
             lineHeight: 1,
           }}
@@ -483,21 +398,17 @@ function DateBracket() {
 export default function ChampalRingCarousel() {
   const images = useMemo(() => CAROUSEL_IMAGES, [])
   const [selected, setSelected] = useState<number | null>(null)
-  const [carouselRunning, setCarouselRunning] = useState(true)
-  const [layoutScale, setLayoutScale] = useState(0.72)
+  const [carouselRunning] = useState(true)
+  const [layoutScale, setLayoutScale] = useState(1)
+  const [ringScale, setRingScale] = useState(0.72)
 
   const sectionRef = useRef<HTMLElement | null>(null)
 
   useLayoutEffect(() => {
     const updateLayout = () => {
       const width = window.innerWidth
-      const height = window.innerHeight
-
-      // Escala de TAMAÑOS, no de coordenadas ni del escenario completo.
-      // 0.72 reproduce la proporción visual aprobada; baja un poco más
-      // en ventanas realmente pequeñas/bajas.
-      const fit = Math.min(width / 1440, height / 760)
-      setLayoutScale(Math.max(0.58, Math.min(0.72, fit * 0.72)))
+      setLayoutScale(Math.min(1, width / 1440))
+      setRingScale(Math.max(0.58, Math.min(0.72, (width / 1440) * 0.72)))
     }
 
     updateLayout()
@@ -514,18 +425,7 @@ export default function ChampalRingCarousel() {
       // Estado inicial
       gsap.set(".champal-red-bar", { y: -140, opacity: 0 })
       gsap.set(".champal-title-char", { opacity: 0, y: 6 })
-      // Cada tarjeta parte ACOSTADA HACIA ATRÁS:
-      // no entra vertical desde abajo. Empieza como una superficie horizontal
-      // plegada 90° hacia el fondo y gira sobre su borde superior hasta ponerse de pie.
-      gsap.set(".champal-value-card", {
-        opacity: 0,
-        y: 118,
-        z: -135,
-        rotationX: -90,
-        transformOrigin: "top center",
-        transformPerspective: 1200,
-        force3D: true,
-      })
+      gsap.set(".champal-center-logo", { opacity: 0, scale: 0.88 })
       gsap.set(".champal-date-bracket", {
         opacity: 0,
         letterSpacing: "-0.5em",
@@ -555,36 +455,11 @@ export default function ChampalRingCarousel() {
 
       // 3) El aro ya está visible y girando desde el primer frame.
 
-      // 4) Tarjetas: rol/flip real, alternando izquierda y derecha por fila.
-      // Secuencia exacta:
-      // fila 1 izquierda -> fila 1 derecha ->
-      // fila 2 izquierda -> fila 2 derecha ->
-      // fila 3 izquierda -> fila 3 derecha.
-      const leftCards = gsap.utils.toArray<HTMLElement>(".champal-value-left")
-      const rightCards = gsap.utils.toArray<HTMLElement>(".champal-value-right")
-
-      const rollCard = (card: HTMLElement, position: string) => {
-        tl.to(
-          card,
-          {
-            opacity: 1,
-            y: 0,
-            z: 0,
-            rotationX: 0,
-            duration: 0.58,
-            ease: "power2.inOut",
-            force3D: true,
-          },
-          position,
-        )
-      }
-
-      rollCard(leftCards[0], "+=0.10")
-      rollCard(rightCards[0], ">-0.08")
-      rollCard(leftCards[1], ">-0.08")
-      rollCard(rightCards[1], ">-0.08")
-      rollCard(leftCards[2], ">-0.08")
-      rollCard(rightCards[2], ">-0.08")
+      tl.to(
+        ".champal-center-logo",
+        { opacity: 1, scale: 1, duration: 0.55, ease: "power2.out" },
+        "-=0.05",
+      )
 
       // 5) Brackets + DESDE 1992
       tl.to(
@@ -603,7 +478,18 @@ export default function ChampalRingCarousel() {
     return () => ctx.revert()
   }, [])
 
-  const title = "Una comunidad comprometida con el desarrollo integral"
+  const title = "Un entorno seguro donde cada persona encuentra su voz"
+  const gridStep = 50
+  const ringPresence = 1.1
+  const ringEnvelopeScale = 0.97
+  const ringStageHeight = Math.round(650 * ringScale * 1.08 * ringPresence)
+  const ringReferenceDateTop = 550
+  const dateTop = 625
+  const dateHeight = 66
+  const ringVerticalAdjustment = 55
+  const ringTop = Math.round(
+    ringReferenceDateTop + dateHeight / 2 - ringStageHeight - gridStep * 2.5 + ringVerticalAdjustment,
+  )
 
   return (
     <section
@@ -611,24 +497,23 @@ export default function ChampalRingCarousel() {
       style={{
         position: "relative",
         width: "100%",
-        height: "100vh",
+        height: `max(100vh, ${Math.round(1120 * layoutScale)}px)`,
         overflow: "hidden",
         backgroundImage: 'url("/images/Fondo Azul Cuadrícula.webp")',
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* 1) TÍTULO PEGADO AL MARGEN IZQUIERDO */}
       <div
         style={{
           position: "absolute",
-          top: `${Math.round(43 * layoutScale)}px`,
-          left: `${Math.round(87 * layoutScale)}px`,
-          right: `${Math.round(46 * layoutScale)}px`,
-          height: `${Math.round(91 * layoutScale)}px`,
-          display: "flex",
-          alignItems: "center",
-          gap: `${Math.round(24 * layoutScale)}px`,
+          left: "50%",
+          top: 0,
+          width: 1440,
+          height: 1120,
+          transform: `translateX(-50%) scale(${layoutScale})`,
+          transformOrigin: "top center",
+          pointerEvents: "none",
           zIndex: 30,
         }}
       >
@@ -636,19 +521,27 @@ export default function ChampalRingCarousel() {
           className="champal-red-bar"
           aria-hidden="true"
           style={{
-            width: `${Math.max(9, Math.round(15 * layoutScale))}px`,
-            height: `${Math.round(91 * layoutScale)}px`,
-            flex: "0 0 auto",
+            position: "absolute",
+            left: 64 - gridStep,
+            top: 43,
+            width: 15,
+            height: 91,
             background: "#DA2028",
+            zIndex: 30,
           }}
         />
 
         <h2
+          className="champal-main-title"
           style={{
+            position: "absolute",
+            left: 96 - gridStep,
+            top: 51,
+            width: 1257,
             margin: 0,
             color: "#fff",
             fontFamily: "Fredoka, sans-serif",
-            fontSize: `${Math.round(48 * layoutScale)}px`,
+            fontSize: 48,
             fontWeight: 600,
             lineHeight: 1,
             whiteSpace: "nowrap",
@@ -669,91 +562,103 @@ export default function ChampalRingCarousel() {
             </span>
           ))}
         </h2>
-      </div>
-
-      {/* 3) COLUMNAS MÁS HACIA LOS MÁRGENES.
-          Ya no comparten una cuadrícula con el aro: el aro queda centrado
-          de forma independiente y las columnas tienen aire a ambos lados. */}
-      <div
-        style={{
-          position: "absolute",
-          left: `${Math.max(72, Math.round(170 * layoutScale))}px`,
-          top: `${Math.round(190 * layoutScale)}px`,
-          zIndex: 18,
-          ["--value-card-width" as string]: `${Math.round(198 * layoutScale * 1.16)}px`,
-          ["--value-icon-size" as string]: `${Math.round(116 * layoutScale)}px`,
-          ["--value-gap" as string]: `${Math.max(5, Math.round(9 * layoutScale))}px`,
-          ["--value-radius" as string]: `${Math.max(6, Math.round(10 * layoutScale))}px`,
-          ["--value-label-height" as string]: `${Math.round(28 * layoutScale * 1.16)}px`,
-          ["--value-font-size" as string]: `${Math.max(11, Math.round(15 * layoutScale))}px`,
-          ["--value-line-height" as string]: `${Math.max(16, Math.round(23 * layoutScale))}px`,
-          ["--column-gap" as string]: `${Math.round(46 * layoutScale)}px`,
-        } as React.CSSProperties}
-      >
-        <ValueColumn values={LEFT_VALUES} side="left" />
-      </div>
 
       <div
+        className="champal-values-viewport"
         style={{
           position: "absolute",
-          right: `${Math.max(72, Math.round(170 * layoutScale))}px`,
-          top: `${Math.round(190 * layoutScale)}px`,
+          left: 119,
+          top: 740,
           zIndex: 18,
-          ["--value-card-width" as string]: `${Math.round(198 * layoutScale * 1.16)}px`,
-          ["--value-icon-size" as string]: `${Math.round(116 * layoutScale)}px`,
-          ["--value-gap" as string]: `${Math.max(5, Math.round(9 * layoutScale))}px`,
-          ["--value-radius" as string]: `${Math.max(6, Math.round(10 * layoutScale))}px`,
-          ["--value-label-height" as string]: `${Math.round(28 * layoutScale * 1.16)}px`,
-          ["--value-font-size" as string]: `${Math.max(11, Math.round(15 * layoutScale))}px`,
-          ["--value-line-height" as string]: `${Math.max(16, Math.round(23 * layoutScale))}px`,
-          ["--column-gap" as string]: `${Math.round(46 * layoutScale)}px`,
-        } as React.CSSProperties}
+        }}
       >
-        <ValueColumn values={RIGHT_VALUES} side="right" />
+        <div className="champal-values-row">
+          <ValueRow />
+        </div>
       </div>
 
-      {/* 2) ARO 35 PX MÁS ARRIBA.
-          El centro del aro sigue exactamente en el centro del viewport. */}
+      </div>
+
       <div
         className="champal-carousel-stage"
         style={{
           position: "absolute",
           left: "50%",
-          top: `${Math.round(-12 * layoutScale)}px`,
+          top: ringTop,
           transform: "translateX(-50%)",
-          width: `${Math.round(1040 * layoutScale * 1.08)}px`,
-          height: `${Math.round(650 * layoutScale * 1.08)}px`,
-          zIndex: 4,
-          pointerEvents: "auto",
+          width: `${Math.round(1040 * ringScale * 1.08 * ringPresence)}px`,
+          height: ringStageHeight,
+          zIndex: 10,
         }}
       >
-        <RoundCarousel
-          images={images}
-          imageWidth={Math.round(340 * layoutScale * 1.08)}
-          imageHeight={Math.round(340 * layoutScale * 1.08)}
-          spacing={1.15}
-          speed={2.4}
-          direction="right"
-          drag
-          sensitivity={4}
-          tilt={32}
-          perspective={3000}
-          cornerRadius={0}
-          innerDim={3.5}
-          background="transparent"
-          onImageClick={setSelected}
-          running={carouselRunning}
-        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 10,
+            pointerEvents: "auto",
+            transform: `scale(${ringEnvelopeScale})`,
+            transformOrigin: "center center",
+          }}
+        >
+          <RoundCarousel
+            images={images}
+            imageWidth={Math.round(340 * ringScale * 1.08 * ringPresence)}
+            imageHeight={Math.round(340 * ringScale * 1.08 * ringPresence)}
+            spacing={1.15}
+            speed={2.4}
+            direction="right"
+            drag
+            sensitivity={4}
+            tilt={30}
+            perspective={3000}
+            cornerRadius={0}
+            innerDim={3.5}
+            background="transparent"
+            onImageClick={setSelected}
+            running={carouselRunning}
+          />
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: `calc(50% + ${gridStep * 4}px)`,
+            width: Math.round(308 * (ringScale / 0.72) * ringPresence),
+            height: Math.round(308 * (ringScale / 0.72) * ringPresence),
+            transform: "translate(-50%, -50%)",
+            pointerEvents: "none",
+            zIndex: 15,
+          }}
+        >
+          <div
+            className="champal-center-logo"
+            style={{ position: "relative", width: "100%", height: "100%" }}
+          >
+            <Image
+              src="/images/Logo Champal Borde Blanco.webp"
+              alt="Colegio Champal"
+              draggable={false}
+              fill
+              sizes="308px"
+              style={{ objectFit: "contain" }}
+            />
+          </div>
+        </div>
       </div>
 
       <div
+        className="champal-date-layer"
         style={{
           position: "absolute",
-          inset: 0,
-          ["--date-scale" as string]: layoutScale,
+          left: 0,
+          right: 0,
+          top: dateTop,
+          height: dateHeight,
           pointerEvents: "none",
-          zIndex: 40,
-        } as React.CSSProperties}
+          zIndex: 20,
+        }}
       >
         <DateBracket />
       </div>

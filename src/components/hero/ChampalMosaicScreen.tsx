@@ -21,128 +21,138 @@ export default function ChampalMosaicScreen({
 
     const ctx = gsap.context(() => {
       const root = wrapperRef.current!
-      const row1 = Array.from(root.querySelectorAll<HTMLElement>(".mosaic-row-1"))
-      const row2 = Array.from(root.querySelectorAll<HTMLElement>(".mosaic-row-2"))
-      const row3 = Array.from(root.querySelectorAll<HTMLElement>(".mosaic-row-3"))
+      const stage = root.querySelector<HTMLElement>(".mosaic-stage")
+      if (!stage) return
 
-      const title1 = root.querySelector<HTMLElement>(".mosaic-title-1")
-      const title2 = root.querySelector<HTMLElement>(".mosaic-title-2")
-      const title3 = root.querySelector<HTMLElement>(".mosaic-title-3")
+      const row1 = gsap.utils.toArray<HTMLElement>(".mosaic-row-1", root)
+      const row2 = gsap.utils.toArray<HTMLElement>(".mosaic-row-2", root)
+      const row3 = gsap.utils.toArray<HTMLElement>(".mosaic-row-3", root)
 
-      const tl = gsap.timeline({
+      const rows = [row1, row2, row3]
+
+      /*
+       * Entrada 3D inspirada en HERO03:
+       * cada pieza nace por debajo del stage, casi acostada,
+       * y se levanta hacia el frente conforme avanza el scroll.
+       *
+       * IMPORTANTE:
+       * - no hay fade-out;
+       * - lo ya acomodado permanece visible;
+       * - las filas se solapan en tiempo;
+       * - al terminar la construcción, el sticky se libera
+       *   y todo sale por el scroll natural de la página.
+       */
+      rows.forEach((row, rowIndex) => {
+        row.forEach((el, pieceIndex) => {
+          // El mosaico ya no nace desde el borde inferior del viewport.
+          // Cada pieza comienza aproximadamente DOS CUADROS de la retícula
+          // por debajo de su posición final (~100 px), mucho más profunda en Z
+          // y prácticamente acostada sobre el plano.
+          const startYOffset = 105 + rowIndex * 10
+
+          const rotateVariants = [-89.2, -88.4, -89.6, -87.8, -88.9]
+          const zVariants = [-1180, -1040, -1260, -1110, -1210]
+          const xVariants = [-14, 10, -8, 12, -6]
+
+          gsap.set(el, {
+            y: startYOffset,
+            x: xVariants[pieceIndex % xVariants.length],
+            z: zVariants[pieceIndex % zVariants.length] - rowIndex * 90,
+            rotateX: rotateVariants[pieceIndex % rotateVariants.length],
+            rotateY: pieceIndex % 2 === 0 ? -1.6 : 1.6,
+            rotateZ: pieceIndex % 3 === 0 ? -0.45 : pieceIndex % 3 === 1 ? 0.4 : 0,
+            scale: 0.90,
+            opacity: 1,
+            transformOrigin: "50% 100%",
+            transformPerspective: 850,
+            force3D: true,
+          })
+        })
+      })
+
+      const timeline = gsap.timeline({
+        defaults: { ease: "none" },
         scrollTrigger: {
           trigger: root,
           start: integrated ? "top bottom" : "top top",
           end: "bottom bottom",
-          scrub: 0.8,
+          scrub: 0.65,
           invalidateOnRefresh: true,
         },
       })
 
-      const setCurvedRow = (row: HTMLElement[], depth = 170, maxAngle = 34) => {
-        const count = row.length
-        const center = (count - 1) / 2
+      const animateRow = (
+        row: HTMLElement[],
+        startAt: number,
+        rowDuration: number,
+        rowIndex: number,
+      ) => {
+        row.forEach((el, pieceIndex) => {
+          const pieceStart = startAt + pieceIndex * 0.025
 
-        row.forEach((el, index) => {
-          const offset = index - center
-          const normalized = center === 0 ? 0 : offset / center
-          const abs = Math.abs(normalized)
-
-          // Curva cilíndrica: los extremos giran hacia el centro y retroceden en Z.
-          const rotationY = -normalized * maxAngle
-          const z = -(abs ** 1.55) * depth
-
-          // Compensación horizontal para mantener la fila visualmente unida.
-          const x = -normalized * abs * 42
-
-          gsap.set(el, {
-            y: window.innerHeight,
-            x,
-            z,
-            rotationY,
-            opacity: 0,
-            transformPerspective: 1100,
-            transformOrigin: normalized < 0 ? "100% 50%" : normalized > 0 ? "0% 50%" : "50% 50%",
-            force3D: true,
-          })
+          timeline.to(
+            el,
+            {
+              keyframes: [
+                {
+                  y: 82 + rowIndex * 8,
+                  z: -760,
+                  rotateX: -80,
+                  rotateY: pieceIndex % 2 === 0 ? -1.2 : 1.2,
+                  rotateZ: 0,
+                  scale: 0.93,
+                  duration: rowDuration * 0.28,
+                  ease: "sine.out",
+                },
+                {
+                  y: 48,
+                  z: -390,
+                  rotateX: -57,
+                  rotateY: pieceIndex % 2 === 0 ? -0.6 : 0.6,
+                  rotateZ: 0,
+                  scale: 0.96,
+                  duration: rowDuration * 0.28,
+                  ease: "sine.out",
+                },
+                {
+                  y: 22,
+                  z: -135,
+                  rotateX: -24,
+                  rotateY: 0,
+                  rotateZ: 0,
+                  scale: 0.985,
+                  duration: rowDuration * 0.24,
+                  ease: "sine.out",
+                },
+                {
+                  y: 0,
+                  x: 0,
+                  z: 0,
+                  rotateX: 0,
+                  rotateY: 0,
+                  rotateZ: 0,
+                  scale: 1,
+                  duration: rowDuration * 0.20,
+                  ease: "power2.out",
+                },
+              ],
+              force3D: true,
+            },
+            pieceStart,
+          )
         })
       }
 
-      const animateCurvedRow = (row: HTMLElement[]) => {
-        tl.to(row, {
-          y: 0,
-          x: 0,
-          z: 0,
-          rotationY: 0,
-          opacity: 1,
-          duration: 1,
-          ease: "none",
-          force3D: true,
-        })
-      }
+      // Solape intencional entre filas:
+      // fila 2 empieza antes de que termine fila 1,
+      // fila 3 empieza antes de que termine fila 2.
+      animateRow(row1, 0.00, 0.46, 0)
+      animateRow(row2, 0.28, 0.46, 1)
+      animateRow(row3, 0.56, 0.46, 2)
 
-      const bounceTitleVertical = (title: HTMLElement | null) => {
-        if (!title) return
-
-        // Rebote únicamente de las letras: arriba -> abajo -> arriba -> reposo.
-        // El bloque de color permanece completamente fijo.
-        tl.to(title, {
-          y: -28,
-          duration: 0.10,
-          ease: "power3.out",
-        })
-          .to(title, {
-            y: 18,
-            duration: 0.11,
-            ease: "power2.in",
-          })
-          .to(title, {
-            y: -12,
-            duration: 0.09,
-            ease: "power2.out",
-          })
-          .to(title, {
-            y: 7,
-            duration: 0.075,
-            ease: "power2.inOut",
-          })
-          .to(title, {
-            y: -4,
-            duration: 0.065,
-            ease: "power2.out",
-          })
-          .to(title, {
-            y: 0,
-            duration: 0.06,
-            ease: "power2.out",
-          })
-      }
-
-      if (integrated) {
-        // En integración, la FILA 1 ya pertenece al mosaico real.
-        // Empieza sin el desplazamiento extra de 100vh porque el propio
-        // contenedor entra desde la parte inferior del viewport.
-        setCurvedRow(row1)
-        row1.forEach((el) => {
-          gsap.set(el, { y: 0 })
-        })
-      } else {
-        setCurvedRow(row1)
-      }
-
-      setCurvedRow(row2)
-      setCurvedRow(row3)
-
-      // Se conserva exactamente la entrada cilíndrica que ya teníamos.
-      // Al terminar de acomodarse cada fila, rebota sólo su texto.
-      animateCurvedRow(row1)
-      bounceTitleVertical(title1)
-
-      animateCurvedRow(row2)
-      bounceTitleVertical(title2)
-
-      animateCurvedRow(row3)
-      bounceTitleVertical(title3)
+      // Pequeño tramo final sin animación para contemplar
+      // las tres filas ya acomodadas antes de liberar el sticky.
+      timeline.to({}, { duration: 0.16 }, 0.96)
 
       ScrollTrigger.refresh()
     }, wrapperRef)
@@ -188,20 +198,12 @@ export default function ChampalMosaicScreen({
         </div>
 
         <div className="icon-block butterfly-block mosaic-row-1">
-          <img
-            src={`${base}/Mariposa.svg`}
-            alt=""
-            className="icon butterfly"
-          />
+          <div className="shape-circle" aria-hidden="true" />
         </div>
 
         {/* FILA CENTRAL */}
         <div className="icon-block airplane-block mosaic-row-2">
-          <img
-            src={`${base}/Avion.svg`}
-            alt=""
-            className="icon airplane"
-          />
+          <div className="shape-arrow" aria-hidden="true" />
         </div>
 
         <div className="media-block video-03 mosaic-row-2">
@@ -270,27 +272,28 @@ export default function ChampalMosaicScreen({
         </div>
 
         <div className="icon-block star-block mosaic-row-3">
-          <img
-            src={`${base}/Estrella.svg`}
-            alt=""
-            className="icon star"
-          />
+          <div className="shape-house" aria-hidden="true" />
         </div>
       </div>
       </div>
 
       <style jsx>{`
         .mosaic-scroll-wrapper {
-          --blue: #124bea;
-          --light-blue: #4894ee;
-          --yellow: #ffc700;
-          --red: #ff151c;
-          --green: #2db927;
-          --orange: #ff6800;
+          --blue-start: #004cff;
+          --blue-end: #002e99;
+          --light-blue-start: #4b93f0;
+          --light-blue-end: #2a58a0;
+          --yellow-start: #ffcc00;
+          --yellow-end: #997a00;
+          --yellow: #ffcc00;
+          --red: #ff0008;
+          --green: #34af27;
+          --orange: #ff7b00;
+          --shape: rgba(255, 255, 255, 0.5);
 
           position: relative;
           width: 100%;
-          height: 400vh;
+          height: ${integrated ? "220vh" : "320vh"};
           background: #012A69;
         }
 
@@ -310,15 +313,13 @@ export default function ChampalMosaicScreen({
           background-attachment: fixed;
         }
 
-
         .mosaic-row-1,
         .mosaic-row-2,
         .mosaic-row-3 {
-          opacity: 0;
-          transform: translate3d(0, 100vh, 0);
+          opacity: 1;
           transform-style: preserve-3d;
-          backface-visibility: hidden;
-          will-change: transform, opacity;
+          backface-visibility: visible;
+          will-change: transform;
         }
 
         .mosaic-title {
@@ -327,7 +328,8 @@ export default function ChampalMosaicScreen({
 
         .mosaic-stage {
           position: relative;
-          perspective: 1100px;
+          perspective: 760px;
+          perspective-origin: 50% 68%;
           transform-style: preserve-3d;
           width: min(100vw, calc(100vh * 1440 / 760));
           height: min(100vh, calc(100vw * 760 / 1440));
@@ -354,7 +356,11 @@ export default function ChampalMosaicScreen({
           object-fit: cover;
         }
 
-        /* FILA 01 */
+        /* =========================================================
+           FILA 01 — Figma 1440 × 760
+           y ≈ 10 / alto 240
+           ========================================================= */
+
         .top-yellow {
           left: calc(0% - 50vw);
           top: 1.3158%;
@@ -375,7 +381,7 @@ export default function ChampalMosaicScreen({
           top: 1.1842%;
           width: 33.3333%;
           height: 31.5789%;
-          background: var(--blue);
+          background: linear-gradient(90deg, var(--blue-start), var(--blue-end));
           border-radius: 0 16px 16px 0;
           padding: 0 20px;
         }
@@ -393,15 +399,44 @@ export default function ChampalMosaicScreen({
           width: 15.9722%;
           height: 31.5789%;
           background: var(--red);
+          overflow: hidden;
         }
 
-        /* FILA 02 */
+        /* Medio círculo: sólo se ve la mitad izquierda dentro del bloque rojo */
+        .shape-circle {
+          position: absolute;
+          left: 50%;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: var(--shape);
+          pointer-events: none;
+        }
+
+        /* =========================================================
+           FILA 02 — y ≈ 255 / alto 240
+           ========================================================= */
+
         .airplane-block {
           left: 7.7083%;
           top: 33.5526%;
           width: 15.4861%;
           height: 31.5789%;
           background: var(--red);
+          overflow: hidden;
+        }
+
+        /* Triángulo/flecha rosa apuntando hacia la derecha */
+        .shape-arrow {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 56.05%;
+          height: 100%;
+          background: var(--shape);
+          clip-path: polygon(0 0, 100% 50%, 0 100%);
+          pointer-events: none;
         }
 
         .video-03 {
@@ -416,7 +451,7 @@ export default function ChampalMosaicScreen({
           top: 33.5526%;
           width: 34.7222%;
           height: 31.5789%;
-          background: var(--yellow);
+          background: linear-gradient(90deg, var(--yellow-start), var(--yellow-end));
           border-radius: 0 16px 16px 0;
           padding: 0 20px;
         }
@@ -436,7 +471,10 @@ export default function ChampalMosaicScreen({
           background: var(--orange);
         }
 
-        /* FILA 03 */
+        /* =========================================================
+           FILA 03 — y ≈ 510 / alto 240
+           ========================================================= */
+
         .green-side {
           left: calc(0% - 50vw);
           top: 67.1053%;
@@ -457,7 +495,7 @@ export default function ChampalMosaicScreen({
           top: 67.1053%;
           width: 34.7222%;
           height: 31.5789%;
-          background: var(--light-blue);
+          background: linear-gradient(90deg, var(--light-blue-start), var(--light-blue-end));
           border-radius: 0 16px 16px 0;
           padding: 0 30px;
         }
@@ -475,6 +513,26 @@ export default function ChampalMosaicScreen({
           width: 15.9722%;
           height: 31.5789%;
           background: var(--red);
+          overflow: hidden;
+        }
+
+        /* Medio octágono 230 × 115, apoyado en el borde inferior
+           del cuadro rojo y ocupando aproximadamente la mitad de su altura */
+        .shape-house {
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: 48%;
+          background: var(--shape);
+          clip-path: polygon(
+            50% 0%,
+            13.5% 28%,
+            0% 100%,
+            100% 100%,
+            86.5% 28%
+          );
+          pointer-events: none;
         }
 
         /* TEXTOS */
@@ -507,34 +565,6 @@ export default function ChampalMosaicScreen({
 
         .text-experiences h2 {
           text-align: left;
-        }
-
-        /* SVG */
-        .icon-block {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-        }
-
-        .icon {
-          display: block;
-          object-fit: contain;
-        }
-
-        .butterfly {
-          width: 90%;
-          height: 85%;
-        }
-
-        .airplane {
-          width: 90%;
-          height: 75%;
-        }
-
-        .star {
-          width: 88%;
-          height: 88%;
         }
 
         @media (max-width: 900px) {
