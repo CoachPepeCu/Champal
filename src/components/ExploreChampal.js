@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import ActividadesExtracurriculares from "@/components/ActividadesExtracurriculares";
 import CampusInteractivo from "@/components/CampusInteractivo";
@@ -52,6 +54,7 @@ const ROUTES = [
     width: 259.491,
     height: 62.742,
     transform: "rotate(-173.43deg)",
+    revealFrom: "right",
   },
   {
     src: `${IMAGE_ROOT}/ruta-convenios.svg`,
@@ -62,6 +65,7 @@ const ROUTES = [
     width: 307.338,
     height: 73.07,
     transform: "rotate(-173.43deg)",
+    revealFrom: "left",
   },
   {
     src: `${IMAGE_ROOT}/ruta-vida-champal.svg`,
@@ -72,6 +76,7 @@ const ROUTES = [
     width: 250.021,
     height: 94.998,
     transform: "rotate(173.43deg) scaleY(-1)",
+    revealFrom: "right",
   },
   {
     src: `${IMAGE_ROOT}/ruta-certificaciones.svg`,
@@ -82,6 +87,7 @@ const ROUTES = [
     width: 282.803,
     height: 139.449,
     transform: "rotate(173.43deg) scaleY(-1)",
+    revealFrom: "left",
   },
   {
     src: `${IMAGE_ROOT}/ruta-actividades-extracurriculares.svg`,
@@ -92,6 +98,7 @@ const ROUTES = [
     width: 165.761,
     height: 234.28,
     transform: "rotate(-173.43deg)",
+    revealFrom: "top",
   },
 ];
 
@@ -100,20 +107,29 @@ const SECTION_BACKGROUND =
 
 function EducationalBackground() {
   return (
-    <>
+    <div
+      data-explore-parallax-bg
+      aria-hidden="true"
+      className="pointer-events-none absolute -inset-y-[8%] inset-x-0 z-[1]"
+      style={{
+        WebkitMaskImage:
+          "linear-gradient(to bottom, #000 0%, #000 calc(100% - 145px), rgba(0,0,0,0.72) calc(100% - 92px), transparent 100%)",
+        maskImage:
+          "linear-gradient(to bottom, #000 0%, #000 calc(100% - 145px), rgba(0,0,0,0.72) calc(100% - 92px), transparent 100%)",
+      }}
+    >
       <Image
         src={`${IMAGE_ROOT}/fondo-educativo.webp`}
         alt=""
         fill
         sizes="100vw"
-        className="pointer-events-none hidden object-cover object-center opacity-10 lg:block"
+        className="hidden object-cover object-center opacity-10 lg:block"
       />
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[length:100%_auto] bg-top bg-repeat-y opacity-10 lg:hidden"
+        className="absolute inset-0 bg-[length:100%_auto] bg-top bg-repeat-y opacity-10 lg:hidden"
         style={{ backgroundImage: `url(${IMAGE_ROOT}/fondo-educativo.webp)` }}
       />
-    </>
+    </div>
   );
 }
 
@@ -145,6 +161,7 @@ function Island({ island, desktop = false, instanceId, isSectionVisible, reduceM
           : `group relative aspect-square w-full appearance-none border-0 bg-transparent p-0 ${island.enabled ? "cursor-pointer focus:outline-none" : ""}`
       }
       style={style}
+      data-explore-island={desktop ? "desktop" : "mobile"}
     >
       <motion.div
         ref={visualRef}
@@ -234,6 +251,8 @@ function DesktopRoute({ route }) {
   return (
     <div
       className="absolute flex items-center justify-center"
+      data-explore-route
+      data-reveal-from={route.revealFrom}
       style={{
         left: pctX(route.left),
         top: pctY(route.top),
@@ -269,6 +288,164 @@ export default function ExploreChampal() {
   const reduceMotion = useReducedMotion();
   const activeWorldConfig = ISLANDS.find((island) => island.id === activeWorld);
   const ActiveWorldContent = activeWorldConfig?.component;
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 1024px)", () => {
+      const ctx = gsap.context(() => {
+        const background = section.querySelector("[data-explore-parallax-bg]");
+        const stage = section.querySelector("[data-explore-stage]");
+        const center = section.querySelector("[data-explore-center]");
+        const islands = gsap.utils.toArray("[data-explore-island='desktop']", section);
+        const routes = gsap.utils.toArray("[data-explore-route]", section);
+
+        if (reduceMotion) {
+          gsap.set([center, ...islands, ...routes], {
+            clearProps: "all",
+            autoAlpha: 1,
+          });
+          return;
+        }
+
+        routes.forEach((route) => {
+          const from = route.dataset.revealFrom;
+          const clipPath =
+            from === "right"
+              ? "inset(0 0 0 100%)"
+              : from === "left"
+                ? "inset(0 100% 0 0)"
+                : "inset(0 0 100% 0)";
+
+          gsap.set(route, {
+            autoAlpha: 0,
+            clipPath,
+          });
+        });
+
+        gsap.set(center, {
+          y: 115,
+          scale: 0.93,
+          autoAlpha: 0,
+          transformOrigin: "50% 100%",
+        });
+
+        gsap.set(islands, {
+          y: 175,
+          scale: 0.88,
+          autoAlpha: 0,
+          transformOrigin: "50% 100%",
+        });
+
+        const entrance = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top 78%",
+            once: true,
+          },
+        });
+
+        entrance
+          .to(center, {
+            y: 0,
+            scale: 1,
+            autoAlpha: 1,
+            duration: 0.82,
+            ease: "back.out(1.7)",
+          })
+          .to(
+            islands,
+            {
+              y: 0,
+              scale: 1,
+              autoAlpha: 1,
+              duration: 0.9,
+              stagger: 0.11,
+              ease: "back.out(1.75)",
+            },
+            "-=0.48",
+          )
+          .to(
+            routes,
+            {
+              autoAlpha: 1,
+              clipPath: "inset(0 0 0 0)",
+              duration: 0.58,
+              stagger: 0.1,
+              ease: "power2.out",
+            },
+            "-=0.18",
+          );
+
+        if (background) {
+          gsap.fromTo(
+            background,
+            { yPercent: -5 },
+            {
+              yPercent: 7,
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 0.8,
+              },
+            },
+          );
+        }
+
+        if (stage) {
+          gsap.fromTo(
+            stage,
+            { yPercent: 2.2 },
+            {
+              yPercent: -2.2,
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 0.8,
+              },
+            },
+          );
+        }
+      }, section);
+
+      return () => ctx.revert();
+    });
+
+    mm.add("(max-width: 1023px)", () => {
+      const ctx = gsap.context(() => {
+        if (reduceMotion) return;
+
+        const center = section.querySelector("[data-explore-center-mobile]");
+        const islands = gsap.utils.toArray("[data-explore-island='mobile']", section);
+
+        gsap.from([center, ...islands], {
+          y: 70,
+          autoAlpha: 0,
+          duration: 0.72,
+          stagger: 0.08,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 84%",
+            once: true,
+          },
+        });
+      }, section);
+
+      return () => ctx.revert();
+    });
+
+    return () => mm.revert();
+  }, [reduceMotion]);
 
   const restoreBody = useCallback(() => {
     const lock = bodyLockRef.current;
@@ -375,13 +552,34 @@ export default function ExploreChampal() {
       id="vida-estudiantil"
       data-section="conoce-champal"
       className="relative overflow-hidden"
-      style={{ backgroundImage: SECTION_BACKGROUND }}
+      style={{
+        marginTop: "-150px",
+        paddingTop: "150px",
+        zIndex: 1,
+        backgroundColor: "#0A2540",
+      }}
     >
+      {/* Fondo propio de Explore. Sube debajo del final de Niveles y se
+          desvanece al final para entregar limpiamente a Historia. */}
+      <div
+        data-explore-base-bg
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: SECTION_BACKGROUND,
+          WebkitMaskImage:
+            "linear-gradient(to bottom, #000 0%, #000 calc(100% - 125px), rgba(0,0,0,0.86) calc(100% - 102px), rgba(0,0,0,0.42) calc(100% - 54px), transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, #000 0%, #000 calc(100% - 125px), rgba(0,0,0,0.86) calc(100% - 102px), rgba(0,0,0,0.42) calc(100% - 54px), transparent 100%)",
+        }}
+      />
+
       <EducationalBackground />
 
       {/* Desktop: canvas exacto de Figma, limitado a 1440 × 760. */}
       <div
-        className="relative mx-auto hidden aspect-[1440/760] w-full max-w-[1440px] lg:block"
+        data-explore-stage
+        className="relative z-10 mx-auto hidden aspect-[1440/760] w-full max-w-[1440px] lg:block"
         style={{ containerType: "inline-size" }}
       >
         <div className="absolute inset-0 z-10">
@@ -391,6 +589,7 @@ export default function ExploreChampal() {
         </div>
 
         <div
+          data-explore-center
           className="absolute z-20"
           style={{ left: pctX(524), top: pctY(116), width: cqw(393), height: cqw(322) }}
         >
@@ -420,8 +619,8 @@ export default function ExploreChampal() {
       </div>
 
       {/* Mobile/tablet: adaptación básica, legible y sin superposiciones. */}
-      <div className="relative mx-auto w-full max-w-3xl px-4 py-8 lg:hidden sm:px-8 sm:py-10">
-        <div className="relative z-20 mx-auto aspect-[393/322] w-[82%] max-w-[393px]">
+      <div className="relative z-10 mx-auto w-full max-w-3xl px-4 py-8 lg:hidden sm:px-8 sm:py-10">
+        <div data-explore-center-mobile className="relative z-20 mx-auto aspect-[393/322] w-[82%] max-w-[393px]">
           <Image
             src={`${IMAGE_ROOT}/campus-central.webp`}
             alt="Campus central de Colegio Champal"

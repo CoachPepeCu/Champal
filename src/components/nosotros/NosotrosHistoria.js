@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import NuestraHistoria from "@/components/nuestra-historia/NuestraHistoria";
 import CircularCurtainOverlay from "@/components/effects/CircularCurtainOverlay";
 
@@ -40,10 +42,13 @@ const TEXT_SHADOW = "0px 4px 4px rgba(0,0,0,0.25)";
 function DesktopFrame() {
   return (
     <div
+      data-history-frame
       className="relative hidden aspect-[1440/350] w-full overflow-hidden lg:block"
       style={{ containerType: "inline-size" }}
     >
-      <Image src={FONDO} alt="" fill preload sizes="100vw" className="object-cover" />
+      <div data-history-bg className="pointer-events-none absolute -inset-y-[14%] inset-x-0">
+        <Image src={FONDO} alt="" fill preload sizes="100vw" className="object-cover" />
+      </div>
 
       {/* Centrado por flex en vez de apilar top/left absolutos (como en
           Figma): el "leading-[20px]" que trae el nodo para un texto de
@@ -54,6 +59,7 @@ function DesktopFrame() {
           el espacio visual real. */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <h2
+          data-history-title
           className="font-serif font-bold uppercase leading-none whitespace-nowrap text-white transition-[filter] duration-300 group-hover:[filter:drop-shadow(0_0_8px_rgba(255,255,255,1))_drop-shadow(0_0_22px_rgba(56,189,248,0.95))] motion-reduce:transition-none"
           style={{
             fontSize: unit(64),
@@ -67,6 +73,7 @@ function DesktopFrame() {
 
         {/* Acento — línea roja bajo el título (Vector 29 en Figma) */}
         <div
+          data-history-accent
           style={{
             width: unit(1011),
             height: unit(8),
@@ -76,6 +83,7 @@ function DesktopFrame() {
         />
 
         <p
+          data-history-subtitle
           className="font-serif font-medium uppercase leading-none whitespace-nowrap text-white"
           style={{
             fontSize: unit(64),
@@ -92,11 +100,14 @@ function DesktopFrame() {
 
 function MobileFrame() {
   return (
-    <div className="relative overflow-hidden lg:hidden">
-      <Image src={FONDO} alt="" fill sizes="100vw" className="object-cover" />
+    <div data-history-frame-mobile className="relative overflow-hidden lg:hidden">
+      <div data-history-bg-mobile className="pointer-events-none absolute -inset-y-[10%] inset-x-0">
+        <Image src={FONDO} alt="" fill sizes="100vw" className="object-cover" />
+      </div>
 
       <div className="relative flex flex-col items-center gap-4 px-6 py-14 text-center sm:gap-5 sm:py-20">
         <h2
+          data-history-title-mobile
           className="font-serif font-bold uppercase leading-tight text-white transition-[filter] duration-300 group-hover:[filter:drop-shadow(0_0_8px_rgba(255,255,255,1))_drop-shadow(0_0_22px_rgba(56,189,248,0.95))] motion-reduce:transition-none"
           style={{
             fontSize: "clamp(24px, 7vw, 40px)",
@@ -107,9 +118,10 @@ function MobileFrame() {
           Conoce Nuestra Historia
         </h2>
 
-        <span className="h-[4px] w-[68%] max-w-[300px] shrink-0" style={{ backgroundColor: ACENTO_ROJO }} />
+        <span data-history-accent-mobile className="h-[4px] w-[68%] max-w-[300px] shrink-0" style={{ backgroundColor: ACENTO_ROJO }} />
 
         <p
+          data-history-subtitle-mobile
           className="font-serif font-medium uppercase leading-tight text-white"
           style={{
             fontSize: "clamp(20px, 6vw, 36px)",
@@ -125,11 +137,175 @@ function MobileFrame() {
 }
 
 export default function NosotrosHistoria() {
+  const sectionRef = useRef(null);
   const triggerRef = useRef(null);
   const bodyLockRef = useRef(null);
   const [phase, setPhase] = useState("idle");
   const [flight, setFlight] = useState(null);
   const reduceMotion = useReducedMotion();
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 1024px)", () => {
+      const ctx = gsap.context(() => {
+        const frame = section.querySelector("[data-history-frame]");
+        const bg = section.querySelector("[data-history-bg]");
+        const title = section.querySelector("[data-history-title]");
+        const accent = section.querySelector("[data-history-accent]");
+        const subtitle = section.querySelector("[data-history-subtitle]");
+
+        if (reduceMotion) {
+          gsap.set([title, accent, subtitle], { clearProps: "all", autoAlpha: 1 });
+          return;
+        }
+
+        if (frame) {
+          gsap.set(frame, {
+            y: 78,
+            autoAlpha: 0.82,
+            clipPath: "inset(18% 0 0 0)",
+          });
+
+          gsap.to(frame, {
+            y: 0,
+            autoAlpha: 1,
+            clipPath: "inset(0% 0 0 0)",
+            duration: 0.92,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 82%",
+              once: true,
+            },
+          });
+        }
+
+        gsap.set(title, { y: 62, autoAlpha: 0 });
+        gsap.set(accent, { scaleX: 0, transformOrigin: "50% 50%", autoAlpha: 0 });
+        gsap.set(subtitle, { y: 52, autoAlpha: 0 });
+
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top 82%",
+            once: true,
+          },
+        })
+          .to(title, {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.75,
+            ease: "power3.out",
+          })
+          .to(
+            accent,
+            {
+              scaleX: 1,
+              autoAlpha: 1,
+              duration: 0.72,
+              ease: "power3.inOut",
+            },
+            "-=0.28",
+          )
+          .to(
+            subtitle,
+            {
+              y: 0,
+              autoAlpha: 1,
+              duration: 0.72,
+              ease: "power3.out",
+            },
+            "-=0.28",
+          );
+
+        if (bg) {
+          gsap.fromTo(
+            bg,
+            { yPercent: -8, scale: 1.05 },
+            {
+              yPercent: 8,
+              scale: 1.01,
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 0.9,
+              },
+            },
+          );
+        }
+      }, section);
+
+      return () => ctx.revert();
+    });
+
+    mm.add("(max-width: 1023px)", () => {
+      const ctx = gsap.context(() => {
+        if (reduceMotion) return;
+
+        const frame = section.querySelector("[data-history-frame-mobile]");
+        const bg = section.querySelector("[data-history-bg-mobile]");
+        const title = section.querySelector("[data-history-title-mobile]");
+        const accent = section.querySelector("[data-history-accent-mobile]");
+        const subtitle = section.querySelector("[data-history-subtitle-mobile]");
+
+        if (frame) {
+          gsap.from(frame, {
+            y: 46,
+            autoAlpha: 0,
+            duration: 0.72,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 88%",
+              once: true,
+            },
+          });
+        }
+
+        gsap.from([title, accent, subtitle], {
+          y: 42,
+          autoAlpha: 0,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 84%",
+            once: true,
+          },
+        });
+
+        if (bg) {
+          gsap.fromTo(
+            bg,
+            { yPercent: -5 },
+            {
+              yPercent: 5,
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 0.8,
+              },
+            },
+          );
+        }
+      }, section);
+
+      return () => ctx.revert();
+    });
+
+    return () => mm.revert();
+  }, [reduceMotion]);
 
   const restoreBody = useCallback(() => {
     const lock = bodyLockRef.current;
@@ -202,8 +378,17 @@ export default function NosotrosHistoria() {
 
   return (
     <>
-      <section id="nuestra-historia" className="group relative bg-[#0a2540]" aria-label="Conoce nuestra historia">
-        <div className={phase === "idle" ? "" : "opacity-0"}>
+      <section
+        ref={sectionRef}
+        id="nuestra-historia"
+        className="group relative overflow-hidden bg-[#0a2540]"
+        aria-label="Conoce nuestra historia"
+        style={{ marginTop: "-125px", paddingTop: "125px", zIndex: 0 }}
+      >
+        <div
+          data-history-content
+          className={phase === "idle" ? "" : "opacity-0"}
+        >
           <DesktopFrame />
           <MobileFrame />
         </div>

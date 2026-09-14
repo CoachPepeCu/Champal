@@ -7,6 +7,7 @@ import ChampalWaveGridIntro from "@/components/hero/ChampalWaveGridIntro"
 import ChampalRingCarousel from "@/components/hero/ChampalRingCarousel"
 import ChampalMosaicScreen from "@/components/hero/ChampalMosaicScreen"
 import ChampalLevelsIntro from "@/components/hero/ChampalLevelsIntro"
+import HomeVerticalNav from "@/components/hero/HomeVerticalNav"
 
 export default function ChampalHeroSequence() {
   const [ringRevealed, setRingRevealed] = useState(false)
@@ -157,6 +158,11 @@ export default function ChampalHeroSequence() {
               }}
             />
           </div>
+
+          {/* Navegación vertical exclusiva de Home.
+              Vive dentro del stage sticky: aparece en WaveGrid + Carrusel
+              y desaparece naturalmente al entrar al Mosaico. */}
+          <HomeVerticalNav />
         </div>
       </section>
 
@@ -184,6 +190,10 @@ export default function ChampalHeroSequence() {
           width: "100%",
           marginTop: 0,
           zIndex: 4,
+          WebkitMaskImage:
+            "linear-gradient(to bottom, #000 0%, #000 calc(100% - 150px), rgba(0,0,0,0.92) calc(100% - 132px), rgba(0,0,0,0.58) calc(100% - 82px), transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, #000 0%, #000 calc(100% - 150px), rgba(0,0,0,0.92) calc(100% - 132px), rgba(0,0,0,0.58) calc(100% - 82px), transparent 100%)",
         }}
       >
         <ChampalLevelsIntro />
