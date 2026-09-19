@@ -136,7 +136,7 @@ function MobileFrame() {
   );
 }
 
-export default function NosotrosHistoria() {
+export default function NosotrosHistoria({ previousSectionOverlap = 125 }) {
   const sectionRef = useRef(null);
   const triggerRef = useRef(null);
   const bodyLockRef = useRef(null);
@@ -383,7 +383,11 @@ export default function NosotrosHistoria() {
         id="nuestra-historia"
         className="group relative overflow-hidden bg-[#0a2540]"
         aria-label="Conoce nuestra historia"
-        style={{ marginTop: "-125px", paddingTop: "125px", zIndex: 0 }}
+        style={{
+          marginTop: previousSectionOverlap ? `-${previousSectionOverlap}px` : 0,
+          paddingTop: previousSectionOverlap,
+          zIndex: 0,
+        }}
       >
         <div
           data-history-content

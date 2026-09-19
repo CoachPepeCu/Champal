@@ -6,6 +6,7 @@ type HomeVerticalNavProps = {
   exploreHref?: string
   contactHref?: string
   platformHref?: string
+  levelOrigin?: "grid" | "anillo"
 }
 
 const LEVELS = [
@@ -16,15 +17,21 @@ const LEVELS = [
   { label: "Preparatoria", href: "/niveles/preparatoria" },
   {
     label: "International High School",
-    href: "/niveles/preparatoria?origen=niveles#international-high-school",
+    href: "/niveles/preparatoria",
+    hash: "#international-high-school",
     ihs: true,
   },
 ]
 
+function levelHref(item: (typeof LEVELS)[number], origin: "grid" | "anillo") {
+  return `${item.href}?origen=${origin}${"hash" in item && item.hash ? item.hash : ""}`
+}
+
 export default function HomeVerticalNav({
-  exploreHref = "#explora-champal",
+  exploreHref = "#vida-estudiantil",
   contactHref = "#contacto",
   platformHref = "#",
+  levelOrigin = "grid",
 }: HomeVerticalNavProps) {
   const [levelsOpen, setLevelsOpen] = useState(false)
   const rootRef = useRef<HTMLElement | null>(null)
@@ -109,7 +116,7 @@ export default function HomeVerticalNav({
           {LEVELS.map((item) => (
             <a
               key={item.label}
-              href={item.href}
+              href={levelHref(item, levelOrigin)}
               className={`level-link ${item.ihs ? "is-ihs" : ""}`}
               tabIndex={levelsOpen ? 0 : -1}
               onClick={closeLevelsNow}

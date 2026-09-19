@@ -2,7 +2,6 @@ import Image from "next/image";
 
 const PORTERIA = "/images/rayados/porteria.png";
 const AVATAR = "/images/rayados/avatar-rayados.png";
-const HALCON = "/images/rayados/halcon.svg";
 const PASTO = "/images/rayados/linea-pasto.png";
 
 // Versión para móvil (< md, 768px) del encabezado + bloque central + pasto
@@ -15,12 +14,14 @@ const PASTO = "/images/rayados/linea-pasto.png";
 // Figma ("el jugador que sobresale"), no un bug de layout.
 export default function RayadosMobileStack() {
   return (
-    <div className="md:hidden">
+    <div data-rayados-mobile className="md:hidden">
       <div
+        data-rayados-hero
         className="relative w-full overflow-hidden bg-[#0b3d2e]"
         style={{ aspectRatio: "375 / 210" }}
       >
         <Image
+          data-rayados-hero-bg
           src={PORTERIA}
           alt=""
           fill
@@ -29,7 +30,7 @@ export default function RayadosMobileStack() {
           className="object-cover"
           style={{ objectPosition: "center 30%" }}
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 px-4 text-center">
+        <div data-rayados-hero-title className="absolute inset-0 flex flex-col items-center justify-center gap-1 px-4 text-center">
           <p
             className="font-serif font-bold leading-tight text-white"
             style={{
@@ -50,7 +51,7 @@ export default function RayadosMobileStack() {
         </div>
       </div>
 
-      <div className="-mt-10 flex justify-center px-4">
+      <div data-rayados-player className="-mt-10 flex justify-center px-4">
         <div className="relative aspect-[246/311] w-[38%] max-w-[160px] drop-shadow-lg">
           <Image
             src={AVATAR}
@@ -62,44 +63,50 @@ export default function RayadosMobileStack() {
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-3 px-6 pb-6 pt-4 text-center">
+      <div data-rayados-central className="flex flex-col items-center gap-3 px-6 pb-6 pt-4 text-center">
         <p
+          data-rayados-central-title
           className="font-serif font-semibold"
           style={{ color: "#003750", fontSize: "clamp(15px, 4.2vw, 18px)", letterSpacing: "3px" }}
         >
           SE PARTE DE
         </p>
         <p
+          data-rayados-central-title
           className="font-serif font-bold leading-tight"
           style={{ color: "#003750", fontSize: "clamp(26px, 8vw, 34px)" }}
         >
           HALCONES CHAMPAL-RAYADOS
         </p>
         <p
+          data-rayados-central-title
           className="font-serif font-semibold text-black"
           style={{ fontSize: "clamp(15px, 4.2vw, 18px)", letterSpacing: "3px" }}
         >
           ESCUELA OFICIAL DE FÚTBOL
         </p>
-        <p
+        <div
           className="max-w-[34rem] text-black"
           style={{ fontSize: "clamp(14px, 3.8vw, 16px)", letterSpacing: "1.2px", lineHeight: 1.6 }}
         >
-          El primer paso en la vida deportiva es importante, es por eso que
-          las Escuelas Oficiales de Rayados son las encargadas de recibir a
-          niños y jóvenes que desean aprender el deporte del fútbol.
-        </p>
+          <span className="block overflow-hidden"><span data-rayados-line className="block">El primer paso en la vida deportiva</span></span>
+          <span className="block overflow-hidden"><span data-rayados-line className="block">es importante, es por eso que las</span></span>
+          <span className="block overflow-hidden"><span data-rayados-line className="block">Escuelas Oficiales de Rayados son las</span></span>
+          <span className="block overflow-hidden"><span data-rayados-line className="block">encargadas de recibir a niños y jóvenes</span></span>
+          <span className="block overflow-hidden"><span data-rayados-line className="block">que desean aprender el deporte</span></span>
+          <span className="block overflow-hidden"><span data-rayados-line className="block">del fútbol.</span></span>
+        </div>
 
         <div className="relative mt-2 h-[140px] w-[112px] opacity-80 sm:h-[180px] sm:w-[145px]">
           {/* mismo espejo en X que RayadosDesktopFrame.js — el filo recto
               del ícono va hacia la derecha. */}
-          <Image
-            src={HALCON}
-            alt=""
-            fill
-            aria-hidden
-            sizes="180px"
-            className="object-contain"
+          <object
+            data-rayados-hawk
+            data="/images/rayados/halcon.svg"
+            type="image/svg+xml"
+            aria-hidden="true"
+            tabIndex={-1}
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain"
             style={{ transform: "scaleX(-1)" }}
           />
         </div>

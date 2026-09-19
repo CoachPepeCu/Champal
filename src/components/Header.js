@@ -197,7 +197,17 @@ export default function Header() {
   const locationSearch = useSyncExternalStore(subscribeToLocation, getLocationSearch, getServerLocationSearch);
   const isHome = pathname === "/";
   const origin = new URLSearchParams(locationSearch).get("origen");
-  const logoHref = pathname.startsWith("/niveles/") && origin === "niveles" ? "/#niveles-educativos" : "/#top";
+
+  let logoHref = "/";
+  if (pathname.startsWith("/niveles/")) {
+    if (origin === "anillo") {
+      logoHref = "/#anillo";
+    } else if (origin === "niveles") {
+      logoHref = "/#niveles-educativos";
+    } else {
+      logoHref = "/";
+    }
+  }
 
   // Ocultar al bajar / reaparecer al subir (SOLO páginas interiores — en
   // Home el header se queda siempre visible, "sticky", como hasta ahora).

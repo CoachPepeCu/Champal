@@ -6,12 +6,6 @@
   perspective: calc(var(--planet-diameter) * 5.5);
   transform-style: preserve-3d;
   pointer-events: none;
-  animation: planet-float var(--planet-float-duration) ease-in-out infinite alternate;
-  animation-play-state: paused;
-}
-
-.active {
-  animation-play-state: running;
 }
 
 .planet {
@@ -29,6 +23,12 @@
   transform: translate(-50%, -50%) translateZ(0);
   transform-style: preserve-3d;
   transition: box-shadow 280ms ease;
+  animation: planet-float var(--planet-float-duration) ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.active .planet {
+  animation-play-state: running;
 }
 
 .texture {
@@ -105,16 +105,16 @@
 
 @keyframes planet-float {
   from {
-    transform: translateY(calc(-1 * var(--planet-float-offset)));
+    transform: translate(-50%, -50%) translateY(calc(-1 * var(--planet-float-offset))) translateZ(0);
   }
 
   to {
-    transform: translateY(var(--planet-float-offset));
+    transform: translate(-50%, -50%) translateY(var(--planet-float-offset)) translateZ(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scene,
+  .planet,
   .ring {
     animation: none;
   }

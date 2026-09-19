@@ -16,7 +16,10 @@ export const metadata = {
     "Descubrimos el potencial de cada persona para ayudarlo a trazar su proyecto de vida. Conoce el nivel Preparatoria de Colegio Champal.",
 };
 
-export default function PreparatoriaPage() {
+export default async function PreparatoriaPage({ searchParams }) {
+  const { origen } = await searchParams;
+  const returnToPlanets = origen === "planetas";
+
   return (
     <div className="flex flex-col flex-1">
       <Header />
@@ -31,7 +34,10 @@ export default function PreparatoriaPage() {
         <Cambridge />
       </main>
       <Footer />
-      <HalconButton />
+      <HalconButton
+        returnToPrevious={returnToPlanets}
+        label={returnToPlanets ? "Regresar a los planetas" : "Regresar a Accesos"}
+      />
     </div>
   );
 }

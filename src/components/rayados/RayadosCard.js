@@ -32,7 +32,7 @@ export default function RayadosCard({
   onToggle,
 }) {
   return (
-    <div className="flex flex-col items-center gap-2 sm:gap-3">
+    <div data-rayados-card className="flex flex-col items-center gap-2 sm:gap-3">
       {/* whitespace-nowrap: los 4 títulos van SIEMPRE en una sola línea (ej.
           "Instalaciones profesionales" no debe partirse — al partirse
           empujaba la línea verde y la foto hacia abajo, rompiendo la
@@ -41,11 +41,12 @@ export default function RayadosCard({
           título más ancho que su columna se derrama visualmente sobre el
           gap en vez de agrandar la columna — igual que en Figma, donde el
           nodo de texto del título es más ancho que la foto de abajo. */}
-      <h3 className="whitespace-nowrap font-serif text-[13px] font-medium tracking-[0.05em] text-[#141c2a] sm:text-[16px] md:text-[20px]">
+      <h3 data-rayados-card-heading className="whitespace-nowrap font-serif text-[13px] font-medium tracking-[0.05em] text-[#141c2a] sm:text-[16px] md:text-[20px]">
         {title}
       </h3>
-      <span className="h-[6px] w-full max-w-[250px] shrink-0 bg-[#4e6804] sm:h-[7px] md:h-[8px]" />
+      <span data-rayados-card-rule className="h-[6px] w-full max-w-[250px] shrink-0 bg-[#4e6804] sm:h-[7px] md:h-[8px]" />
       <button
+        data-rayados-card-image
         type="button"
         aria-expanded={isOpen}
         aria-label={`${title}: ver detalle`}

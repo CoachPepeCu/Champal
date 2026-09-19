@@ -91,7 +91,7 @@ export default function ConexionUniversitariaGlobos() {
       className="relative z-10 mx-auto hidden aspect-[1440/760] lg:block"
       style={{ width: "min(100vw, calc(100dvh * 1440 / 760))" }}
     >
-      <div className="absolute left-[7.15%] top-[7.75%] z-10 w-[30.7%]">
+      <div className="absolute left-[7.15%] top-[7.75%] z-10 w-[34%]">
         <motion.div
           className="mb-[5px] flex items-center gap-[14px]"
           initial={reduceMotion ? false : { opacity: 0, x: -90 }}
@@ -103,7 +103,7 @@ export default function ConexionUniversitariaGlobos() {
           initial={reduceMotion ? false : { clipPath: "inset(0 0 100% 0)" }}
           animate={{ clipPath: "inset(0 0 0% 0)" }}
           transition={{ duration: reduceMotion ? 0 : 0.72, delay: reduceMotion ? 0 : 0.94, ease: EASE_OUT }}
-        ><h2 id="conexion-universitaria" className="font-display text-[clamp(34px,3.2vw,46px)] font-medium leading-[.96] text-white [text-shadow:0_4px_4px_rgba(0,0,0,.25)]">Construimos puentes para ampliar sus posibilidades</h2></motion.div>
+        ><h2 id="conexion-universitaria" className="font-display text-[clamp(34px,3.2vw,46px)] font-medium leading-[.96] text-white [text-shadow:0_4px_4px_rgba(0,0,0,.25)]"><span className="block whitespace-nowrap">Construimos puentes</span><span className="block whitespace-nowrap">para ampliar sus</span><span className="block whitespace-nowrap">posibilidades.</span></h2></motion.div>
       </div>
       {universities.map((university, index) => <Balloon key={university.alt} university={university} index={index} reduceMotion={reduceMotion} />)}
     </div>
@@ -121,7 +121,7 @@ export default function ConexionUniversitariaGlobos() {
           initial={reduceMotion ? false : { clipPath: "inset(0 0 100% 0)" }}
           animate={{ clipPath: "inset(0 0 0% 0)" }}
           transition={{ duration: reduceMotion ? 0 : 0.72, delay: reduceMotion ? 0 : 0.94, ease: EASE_OUT }}
-        ><h2 className="font-display text-4xl font-medium leading-none text-white [text-shadow:0_3px_4px_rgba(0,0,0,.25)]">Construimos puentes para ampliar sus posibilidades</h2></motion.div>
+        ><h2 className="font-display text-[clamp(30px,9vw,36px)] font-medium leading-none text-white [text-shadow:0_3px_4px_rgba(0,0,0,.25)]"><span className="block whitespace-nowrap">Construimos puentes</span><span className="block whitespace-nowrap">para ampliar sus</span><span className="block whitespace-nowrap">posibilidades.</span></h2></motion.div>
       </div>
       <div className="relative z-10 grid grid-cols-3 gap-x-2 gap-y-1 sm:grid-cols-4">{universities.map((university, index) => <Balloon key={university.alt} university={university} index={index} mobile reduceMotion={reduceMotion} />)}</div>
     </div>

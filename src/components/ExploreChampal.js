@@ -288,6 +288,7 @@ export default function ExploreChampal() {
   const reduceMotion = useReducedMotion();
   const activeWorldConfig = ISLANDS.find((island) => island.id === activeWorld);
   const ActiveWorldContent = activeWorldConfig?.component;
+  const isRayadosDetail = activeWorld === "actividades-extracurriculares" && activeDetail === "rayados";
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -493,6 +494,7 @@ export default function ExploreChampal() {
 
     triggerRef.current = trigger;
     geometryRef.current = visual;
+    setActiveDetail(null);
     setActiveWorld(island.id);
     setActiveInstance(instanceId);
     setFlight({
@@ -507,7 +509,7 @@ export default function ExploreChampal() {
   }, [phase]);
 
   const closeOverlay = useCallback(() => {
-    if (activeDetail) {
+    if (activeWorld === "actividades-extracurriculares" && activeDetail) {
       setActiveDetail(null);
       return;
     }
@@ -530,7 +532,7 @@ export default function ExploreChampal() {
 
       return "closing";
     });
-  }, [activeDetail]);
+  }, [activeDetail, activeWorld]);
 
   const finishClose = useCallback(() => {
     restoreBody();
@@ -651,14 +653,14 @@ export default function ExploreChampal() {
           origin={flight.origin}
           flight={flight}
           reduceMotion={reduceMotion}
-          ariaLabel={activeDetail === "rayados" ? "Escuela Oficial Rayados de Monterrey" : activeWorldConfig.ariaLabel}
-          closeAriaLabel={activeDetail === "rayados" ? "Volver a Actividades extracurriculares" : "Volver a Conoce Champal"}
+          ariaLabel={isRayadosDetail ? "Escuela Oficial Rayados de Monterrey" : activeWorldConfig.ariaLabel}
+          closeAriaLabel={isRayadosDetail ? "Volver a Actividades extracurriculares" : "Volver a Conoce Champal"}
           onClose={closeOverlay}
           onFlightComplete={() => setPhase((current) => (current === "flying" ? "revealing" : current))}
           onOpened={() => setPhase((current) => (current === "revealing" ? "open" : current))}
           onClosed={finishClose}
         >
-          {activeDetail === "rayados" ? (
+          {isRayadosDetail ? (
             <Rayados />
           ) : activeWorld === "actividades-extracurriculares" ? (
             <ActiveWorldContent onOpenRayados={() => setActiveDetail("rayados")} />

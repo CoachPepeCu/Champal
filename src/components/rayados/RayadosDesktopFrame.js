@@ -4,7 +4,6 @@ import { pctX, pctY, cqw, cqwText } from "./rayadosMath";
 const PORTERIA = "/images/rayados/porteria.png";
 const AVATAR = "/images/rayados/avatar-rayados.png";
 const ELLIPSE = "/images/rayados/ellipse-dot.svg";
-const HALCON = "/images/rayados/halcon.svg";
 const PASTO = "/images/rayados/linea-pasto.png";
 
 // node 1272:991 "Porteria" mide 278 de alto (contra los 895 del canvas
@@ -30,6 +29,7 @@ function porteriaPctY(px) {
 export default function RayadosDesktopFrame() {
   return (
     <div
+      data-rayados-desktop
       className="relative hidden w-full md:block"
       style={{
         aspectRatio: "1440 / 895",
@@ -38,11 +38,13 @@ export default function RayadosDesktopFrame() {
     >
       {/* node 1272:991 "Porteria" — cancha, portería y portero */}
       <div
+        data-rayados-hero
         className="absolute overflow-hidden bg-[#0b3d2e]"
         style={{ left: 0, top: 0, width: cqw(1440), height: cqw(278) }}
       >
         <div className="absolute inset-0 overflow-hidden">
           <Image
+            data-rayados-hero-bg
             src={PORTERIA}
             alt=""
             width={1344}
@@ -63,6 +65,7 @@ export default function RayadosDesktopFrame() {
 
         {/* node 1273:992 */}
         <p
+          data-rayados-hero-title
           className="absolute whitespace-nowrap text-center font-serif font-bold text-white"
           style={{
             left: pctX(661),
@@ -101,6 +104,7 @@ export default function RayadosDesktopFrame() {
 
       {/* node 1270:990 "Avatar Rayados" — jugador que sobresale del encabezado */}
       <div
+        data-rayados-player
         className="absolute"
         style={{ left: pctX(41), top: pctY(43), width: cqw(246), height: cqw(311) }}
       >
@@ -115,6 +119,7 @@ export default function RayadosDesktopFrame() {
 
       {/* node 1273:1001 "Halcón" — bloque central */}
       <div
+        data-rayados-central
         className="absolute flex items-center"
         style={{ left: pctX(73), top: pctY(322), gap: cqw(57) }}
       >
@@ -123,6 +128,7 @@ export default function RayadosDesktopFrame() {
           style={{ width: cqw(929), gap: cqw(13) }}
         >
           <p
+            data-rayados-central-title
             className="text-center font-serif font-semibold"
             style={{
               color: "#003750",
@@ -138,6 +144,7 @@ export default function RayadosDesktopFrame() {
               Fredoka en su peso más pesado para conservar el aire "deportivo
               display" sin instalar ninguna fuente nueva. */}
           <p
+            data-rayados-central-title
             className="text-center font-serif font-bold"
             style={{
               color: "#003750",
@@ -148,6 +155,7 @@ export default function RayadosDesktopFrame() {
             HALCONES CHAMPAL-RAYADOS
           </p>
           <p
+            data-rayados-central-title
             className="text-center font-serif font-semibold text-black"
             style={{
               fontSize: cqwText(32, 16),
@@ -157,7 +165,7 @@ export default function RayadosDesktopFrame() {
           >
             ESCUELA OFICIAL DE FÚTBOL
           </p>
-          <p
+          <div
             className="text-black"
             style={{
               width: cqw(734),
@@ -166,10 +174,11 @@ export default function RayadosDesktopFrame() {
               lineHeight: 1.75,
             }}
           >
-            El primer paso en la vida deportiva es importante, es por eso que
-            las Escuelas Oficiales de Rayados son las encargadas de recibir a
-            niños y jóvenes que desean aprender el deporte del fútbol.
-          </p>
+            <span className="block overflow-hidden"><span data-rayados-line className="block">El primer paso en la vida deportiva es importante, es por</span></span>
+            <span className="block overflow-hidden"><span data-rayados-line className="block">eso que las Escuelas Oficiales de Rayados son las</span></span>
+            <span className="block overflow-hidden"><span data-rayados-line className="block">encargadas de recibir a niños y jóvenes que desean</span></span>
+            <span className="block overflow-hidden"><span data-rayados-line className="block">aprender el deporte del fútbol.</span></span>
+          </div>
         </div>
 
         <div
@@ -182,13 +191,13 @@ export default function RayadosDesktopFrame() {
               Transform por `style`, no con una utilidad Tailwind
               `-scale-x-100` — no funciona en este proyecto (Tailwind v4),
               ver memoria de proyecto "champal-tailwind-v4-negative-utilities". */}
-          <Image
-            src={HALCON}
-            alt=""
-            fill
-            aria-hidden
-            sizes="(max-width: 1024px) 25vw, 382px"
-            className="object-contain"
+          <object
+            data-rayados-hawk
+            data="/images/rayados/halcon.svg"
+            type="image/svg+xml"
+            aria-hidden="true"
+            tabIndex={-1}
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain"
             style={{ transform: "scaleX(-1)" }}
           />
         </div>

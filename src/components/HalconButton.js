@@ -43,6 +43,7 @@ export default function HalconButton({
   label = "Regresar a Accesos",
   ariaLabel,
   onClick,
+  returnToPrevious = false,
   className = "",
 }) {
   const [visible, setVisible] = useState(false);
@@ -58,13 +59,18 @@ export default function HalconButton({
   }, [heroId, onClick]);
 
   const isVisible = onClick ? true : visible;
-  const MotionControl = onClick ? motion.button : motion.a;
+  const useButton = Boolean(onClick || returnToPrevious);
+  const MotionControl = useButton ? motion.button : motion.a;
+  const handleClick = onClick ?? (returnToPrevious ? () => {
+    if (window.history.length > 1) window.history.back();
+    else window.location.assign("/#planetas");
+  } : undefined);
 
   return (
     <AnimatePresence>
       {isVisible && (
         <MotionControl
-          {...(onClick ? { type: "button", onClick } : { href: `#${targetId}` })}
+          {...(useButton ? { type: "button", onClick: handleClick } : { href: `#${targetId}` })}
           aria-label={ariaLabel ?? label}
           initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.6, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}

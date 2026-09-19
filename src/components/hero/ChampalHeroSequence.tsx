@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import ChampalWaveGridIntro from "@/components/hero/ChampalWaveGridIntro"
@@ -11,7 +11,35 @@ import HomeVerticalNav from "@/components/hero/HomeVerticalNav"
 
 export default function ChampalHeroSequence() {
   const [ringRevealed, setRingRevealed] = useState(false)
+  const [restoringRing, setRestoringRing] = useState(false)
   const introTransitionRef = useRef<HTMLElement | null>(null)
+
+  // Si regresamos desde una página de nivel cuyo origen fue el anillo,
+  // reconstruimos directamente esa escena en vez de mostrar el Grid.
+  useLayoutEffect(() => {
+    if (window.location.hash !== "#anillo") return
+
+    // Al volver desde una página interior NO debemos reconstruir la transición
+    // del Grid. Entramos directamente a la escena ya revelada del anillo.
+    setRestoringRing(true)
+    setRingRevealed(true)
+
+    const restoreRing = () => {
+      const target = document.getElementById("anillo")
+      if (target) {
+        target.scrollIntoView({ block: "start", behavior: "auto" })
+      }
+    }
+
+    restoreRing()
+    const raf = requestAnimationFrame(restoreRing)
+    const timer = window.setTimeout(restoreRing, 120)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      window.clearTimeout(timer)
+    }
+  }, [])
 
   useEffect(() => {
     if (!introTransitionRef.current || !ringRevealed) return
@@ -107,6 +135,7 @@ export default function ChampalHeroSequence() {
       }}
     >
       <section
+        id="anillo"
         ref={introTransitionRef}
         aria-label="Introducción y comunidad Champal"
         style={{
@@ -150,6 +179,10 @@ export default function ChampalHeroSequence() {
               inset: 0,
               zIndex: 10,
               pointerEvents: ringRevealed ? "none" : "auto",
+              // Si llegamos por /#anillo desde una página interior, el Grid no
+              // debe quedar visualmente encima del anillo. En la navegación
+              // normal se conserva intacta su animación de explosión.
+              display: restoringRing ? "none" : "block",
             }}
           >
             <ChampalWaveGridIntro
@@ -162,7 +195,11 @@ export default function ChampalHeroSequence() {
           {/* Navegación vertical exclusiva de Home.
               Vive dentro del stage sticky: aparece en WaveGrid + Carrusel
               y desaparece naturalmente al entrar al Mosaico. */}
-          <HomeVerticalNav />
+          {ringRevealed ? (
+            <HomeVerticalNav levelOrigin="anillo" />
+          ) : (
+            <HomeVerticalNav levelOrigin="grid" />
+          )}
         </div>
       </section>
 
@@ -184,6 +221,7 @@ export default function ChampalHeroSequence() {
       {/* Niveles + edificio + IHS:
           entra por flujo natural después del mosaico. */}
       <section
+        id="niveles-educativos"
         aria-label="Niveles educativos Champal"
         style={{
           position: "relative",
