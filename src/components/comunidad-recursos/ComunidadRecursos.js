@@ -438,6 +438,16 @@ function DesktopFrame() {
         <p style={{ width: unit(297), fontSize: unit(14) }}>
           correo: <DLink href="mailto:quejas@conapred.gob.mx">quejas@conapred.gob.mx</DLink>
         </p>
+        <a
+          href="https://conectate.conapred.gob.mx/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visitar Conéctate de CONAPRED (abre en una pestaña nueva)"
+          className="block text-center text-white underline"
+          style={{ width: unit(297), fontSize: unit(14) }}
+        >
+          conectate.conapred.gob.mx
+        </a>
       </DCard>
 
       {/* ---- Ciberseguridad y Convivencia Digital ---- */}
@@ -675,6 +685,15 @@ function MobileFrame() {
               quejas@conapred.gob.mx
             </a>
           </p>
+          <a
+            href="https://conectate.conapred.gob.mx/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visitar Conéctate de CONAPRED (abre en una pestaña nueva)"
+            className="block text-center text-sm text-white underline"
+          >
+            conectate.conapred.gob.mx
+          </a>
         </MCard>
       </section>
 
