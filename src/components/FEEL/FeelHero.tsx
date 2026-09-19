@@ -344,6 +344,67 @@ export default function FeelHero() {
     const root = rootRef.current;
     if (!root) return;
 
+    const scrollRoot =
+      root.closest<HTMLElement>("[data-feel-scroll-root]") ?? null;
+    const sentinels = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-feel-load-sentinel]"),
+    );
+
+    const activateGroup = (group: string) => {
+      const media = Array.from(
+        root.querySelectorAll<HTMLImageElement | HTMLVideoElement>(
+          `[data-feel-load-group="${group}"]`,
+        ),
+      );
+
+      media.forEach((element) => {
+        const source = element.dataset.feelSrc;
+        if (!source || element.getAttribute("src")) return;
+
+        element.setAttribute("src", source);
+
+        if (element instanceof HTMLVideoElement) {
+          element.load();
+          if (element.autoplay) {
+            const playPromise = element.play();
+            if (playPromise) playPromise.catch(() => {});
+          }
+        }
+      });
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      sentinels.forEach((sentinel) => {
+        const group = sentinel.dataset.feelLoadSentinel;
+        if (group) activateGroup(group);
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const sentinel = entry.target as HTMLElement;
+          const group = sentinel.dataset.feelLoadSentinel;
+          if (group) activateGroup(group);
+          observer.unobserve(sentinel);
+        });
+      },
+      {
+        root: scrollRoot,
+        rootMargin: "40% 0px 40% 0px",
+      },
+    );
+
+    sentinels.forEach((sentinel) => observer.observe(sentinel));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
     const loopContainers = Array.from(
       root.querySelectorAll<HTMLElement>(".feel-smooth-loop"),
     );
@@ -2831,6 +2892,21 @@ export default function FeelHero() {
 
   return (
     <section ref={rootRef} className="feel-hero" aria-labelledby="feel-title">
+      <span
+        className="feel-load-sentinel feel-load-sentinel-2"
+        data-feel-load-sentinel="feel2"
+        aria-hidden="true"
+      />
+      <span
+        className="feel-load-sentinel feel-load-sentinel-3"
+        data-feel-load-sentinel="feel3"
+        aria-hidden="true"
+      />
+      <span
+        className="feel-load-sentinel feel-load-sentinel-4"
+        data-feel-load-sentinel="feel4"
+        aria-hidden="true"
+      />
       <style>{`
         .feel-hero {
           position: relative;
@@ -2948,6 +3024,19 @@ export default function FeelHero() {
           height: auto;
           overflow: visible;
         }
+
+        .feel-load-sentinel {
+          position: absolute;
+          left: 0;
+          width: 1px;
+          height: 1px;
+          pointer-events: none;
+          opacity: 0;
+        }
+
+        .feel-load-sentinel-2 { top: 150svh; }
+        .feel-load-sentinel-3 { top: 260svh; }
+        .feel-load-sentinel-4 { top: 430svh; }
 
         .feel-base-path {
           fill: #ffffff;
@@ -3912,13 +4001,15 @@ export default function FeelHero() {
           <img
             ref={feel4MorphCubeRef}
             className="feel4-morph-image"
-            src={FEEL_ASSETS.feelCube}
+            data-feel-load-group="feel4"
+            data-feel-src={FEEL_ASSETS.feelCube}
             alt=""
           />
           <img
             ref={feel4MorphHeartRef}
             className="feel4-morph-image"
-            src={FEEL_ASSETS.feelHeart}
+            data-feel-load-group="feel4"
+            data-feel-src={FEEL_ASSETS.feelHeart}
             alt=""
           />
         </div>
@@ -4035,10 +4126,11 @@ export default function FeelHero() {
           <video
             ref={sphereVideoRef}
             className="feel2-sphere-video"
-            src={FEEL_ASSETS.heartToSphere}
+            data-feel-load-group="feel2"
+            data-feel-src={FEEL_ASSETS.heartToSphere}
             muted
             playsInline
-            preload="auto"
+            preload="none"
           />
         </div>
 
@@ -4063,13 +4155,15 @@ export default function FeelHero() {
           <img
             ref={feel3MorphSphereRef}
             className="feel3-morph-image feel3-morph-sphere"
-            src={FEEL_ASSETS.feelSphere}
+            data-feel-load-group="feel3"
+            data-feel-src={FEEL_ASSETS.feelSphere}
             alt=""
           />
           <img
             ref={feel3MorphCubeRef}
             className="feel3-morph-image feel3-morph-cube"
-            src={FEEL_ASSETS.feelCube}
+            data-feel-load-group="feel3"
+            data-feel-src={FEEL_ASSETS.feelCube}
             alt=""
           />
         </div>
@@ -4097,29 +4191,36 @@ export default function FeelHero() {
             aria-hidden="true"
           >
             <video
-              src={FEEL_ASSETS.feelBackground}
+              data-feel-load-group="feel3"
+              data-feel-src={FEEL_ASSETS.feelBackground}
               autoPlay
               muted
               playsInline
-              preload="auto"
+              preload="none"
             />
             <video
-              src={FEEL_ASSETS.feelBackground}
+              data-feel-load-group="feel3"
+              data-feel-src={FEEL_ASSETS.feelBackground}
               muted
               playsInline
-              preload="auto"
+              preload="none"
             />
           </div>
 
           <img
             className="feel3-branch"
-            src={FEEL_ASSETS.feelBranch}
+            data-feel-load-group="feel3"
+            data-feel-src={FEEL_ASSETS.feelBranch}
             alt=""
             aria-hidden="true"
           />
 
           <div className="feel3-corner-cube" aria-hidden="true">
-            <img src={FEEL_ASSETS.feelCube} alt="" />
+            <img
+              data-feel-load-group="feel3"
+              data-feel-src={FEEL_ASSETS.feelCube}
+              alt=""
+            />
           </div>
 
           <p ref={feel3TitleRef} className="feel3-title">
@@ -4168,10 +4269,11 @@ export default function FeelHero() {
             <video
               ref={feel3BalloonVideoRef}
               className="feel3-balloon-video"
-              src={FEEL_ASSETS.balloonTurn}
+              data-feel-load-group="feel3"
+              data-feel-src={FEEL_ASSETS.balloonTurn}
               muted
               playsInline
-              preload="auto"
+              preload="none"
             />
 
             <div ref={feel3SignRef} className="feel3-sign">
@@ -4182,7 +4284,8 @@ export default function FeelHero() {
               <div className="feel3-curtain-row">
                 <img
                   className="feel3-curtain-icon"
-                  src={FEEL_ASSETS.feelHeart}
+                  data-feel-load-group="feel3"
+                  data-feel-src={FEEL_ASSETS.feelHeart}
                   alt=""
                 />
                 <p className="feel3-curtain-text">
@@ -4193,7 +4296,8 @@ export default function FeelHero() {
               <div className="feel3-curtain-row">
                 <img
                   className="feel3-curtain-icon"
-                  src={FEEL_ASSETS.feelCube}
+                  data-feel-load-group="feel3"
+                  data-feel-src={FEEL_ASSETS.feelCube}
                   alt=""
                 />
                 <p className="feel3-curtain-text">
@@ -4204,7 +4308,8 @@ export default function FeelHero() {
               <div className="feel3-curtain-row">
                 <img
                   className="feel3-curtain-icon"
-                  src={FEEL_ASSETS.feelSphere}
+                  data-feel-load-group="feel3"
+                  data-feel-src={FEEL_ASSETS.feelSphere}
                   alt=""
                 />
                 <p className="feel3-curtain-text">
@@ -4227,17 +4332,19 @@ export default function FeelHero() {
             aria-hidden="true"
           >
             <video
-              src={FEEL_ASSETS.feelBackground}
+              data-feel-load-group="feel4"
+              data-feel-src={FEEL_ASSETS.feelBackground}
               autoPlay
               muted
               playsInline
-              preload="auto"
+              preload="none"
             />
             <video
-              src={FEEL_ASSETS.feelBackground}
+              data-feel-load-group="feel4"
+              data-feel-src={FEEL_ASSETS.feelBackground}
               muted
               playsInline
-              preload="auto"
+              preload="none"
             />
           </div>
 
@@ -4251,7 +4358,8 @@ export default function FeelHero() {
 
           <img
             className="feel4-particles-bg"
-            src={FEEL_ASSETS.feel4Particles}
+            data-feel-load-group="feel4"
+            data-feel-src={FEEL_ASSETS.feel4Particles}
             alt=""
             aria-hidden="true"
           />
@@ -4264,14 +4372,16 @@ export default function FeelHero() {
 
           <img
             className="feel4-tree"
-            src={FEEL_ASSETS.tree}
+            data-feel-load-group="feel4"
+            data-feel-src={FEEL_ASSETS.tree}
             alt=""
             aria-hidden="true"
           />
 
           <img
             className="feel4-heart"
-            src={FEEL_ASSETS.feelHeart}
+            data-feel-load-group="feel4"
+            data-feel-src={FEEL_ASSETS.feelHeart}
             alt=""
             aria-hidden="true"
           />
@@ -4280,7 +4390,8 @@ export default function FeelHero() {
             <article className="feel4-card">
               <img
                 className="feel4-card-image"
-                src={FEEL_ASSETS.feel4Card1}
+                data-feel-load-group="feel4"
+                data-feel-src={FEEL_ASSETS.feel4Card1}
                 alt=""
               />
               <p className="feel4-card-copy">
@@ -4293,7 +4404,8 @@ export default function FeelHero() {
             <article className="feel4-card">
               <img
                 className="feel4-card-image"
-                src={FEEL_ASSETS.feel4Card2}
+                data-feel-load-group="feel4"
+                data-feel-src={FEEL_ASSETS.feel4Card2}
                 alt=""
               />
               <p className="feel4-card-copy">
@@ -4305,7 +4417,8 @@ export default function FeelHero() {
             <article className="feel4-card">
               <img
                 className="feel4-card-image"
-                src={FEEL_ASSETS.feel4Card3}
+                data-feel-load-group="feel4"
+                data-feel-src={FEEL_ASSETS.feel4Card3}
                 alt=""
               />
               <p className="feel4-card-copy">

@@ -105,19 +105,17 @@ export default function CampusInteractivo() {
 
   useEffect(() => {
     if (!selectedArea || selectedArea.photos.length < 2) return;
-    const previous = (photoIndex - 1 + selectedArea.photos.length) % selectedArea.photos.length;
     const next = (photoIndex + 1) % selectedArea.photos.length;
-    preloadImage(selectedArea.photos[previous]);
     preloadImage(selectedArea.photos[next]);
   }, [photoIndex, selectedArea]);
 
-  const transitionToPhoto = useCallback(async (src, nextIndex, areaLabel, photoCount) => {
+  const transitionToPhoto = useCallback(async (src, nextIndex, areaLabel, photoCount, replaceCurrent = false) => {
     const operation = ++photoOperationRef.current;
     setPhotoTransitioning(true);
     await preloadImage(src);
     if (!mountedRef.current || operation !== photoOperationRef.current) return;
 
-    if (!currentPhoto || !viewerVisible) {
+    if (replaceCurrent || !currentPhoto || !viewerVisible) {
       setCurrentPhoto(src);
       setPhotoIndex(nextIndex);
       setIncomingPhoto(null);
@@ -146,6 +144,8 @@ export default function CampusInteractivo() {
   const selectArea = useCallback((area) => {
     setSelectedAreaId(area.id);
     setPhotoIndex(0);
+    setCurrentPhoto(null);
+    setViewerVisible(false);
     if (area.photos.length === 0) {
       photoOperationRef.current += 1;
       window.clearTimeout(photoTimerRef.current);
@@ -156,7 +156,7 @@ export default function CampusInteractivo() {
       setAnnouncement("No hay fotografías disponibles");
       return;
     }
-    transitionToPhoto(area.photos[0], 0, area.label, area.photos.length);
+    transitionToPhoto(area.photos[0], 0, area.label, area.photos.length, true);
   }, [transitionToPhoto]);
 
   const navigatePhoto = useCallback((direction) => {
@@ -296,8 +296,8 @@ export default function CampusInteractivo() {
           onKeyDown={handleViewerKeyDown}
         >
           <div className="campus-photo-stage">
-            {currentPhoto && <Image src={currentPhoto} alt="" fill unoptimized sizes="(min-width: 1440px) 900px, (min-width: 640px) 62.5vw, 100vw" className="campus-photo is-current" />}
-            {incomingPhoto && <Image src={incomingPhoto} alt="" fill unoptimized sizes="(min-width: 1440px) 900px, (min-width: 640px) 62.5vw, 100vw" className={`campus-photo is-incoming${incomingVisible ? " is-visible" : ""}`} style={{ "--photo-duration": `${photoDuration}ms` }} />}
+            {currentPhoto && <Image src={currentPhoto} alt="" fill unoptimized loading="lazy" decoding="async" sizes="(min-width: 1440px) 900px, (min-width: 640px) 62.5vw, 100vw" className="campus-photo is-current" />}
+            {incomingPhoto && <Image src={incomingPhoto} alt="" fill unoptimized loading="lazy" decoding="async" sizes="(min-width: 1440px) 900px, (min-width: 640px) 62.5vw, 100vw" className={`campus-photo is-incoming${incomingVisible ? " is-visible" : ""}`} style={{ "--photo-duration": `${photoDuration}ms` }} />}
           </div>
         </div>
 
