@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const FEEL_ASSETS = {
+  feelBackground: "/images/FEEL/fondo-feel.webm",
   heart: "/images/FEEL/corazon.webp",
   tree: "/images/FEEL/Arbol.png",
   lavender: "/images/FEEL/Lavanda.mp4",
@@ -192,6 +193,9 @@ function drawHeartWithoutPlate(
 export default function FeelHero() {
   const rootRef = useRef<HTMLElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
+  const feelBackgroundRef = useRef<HTMLDivElement | null>(null);
+  const feelBackgroundARef = useRef<HTMLVideoElement | null>(null);
+  const feelBackgroundBRef = useRef<HTMLVideoElement | null>(null);
 
   const heartRef = useRef<HTMLDivElement | null>(null);
   const heartSourceRef = useRef<HTMLImageElement | null>(null);
@@ -235,14 +239,258 @@ export default function FeelHero() {
   const feel4ParticlesRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    const videoA = feelBackgroundARef.current;
+    const videoB = feelBackgroundBRef.current;
+
+    if (!videoA || !videoB) return;
+
+    const CROSSFADE_SECONDS = 0.9;
+    let activeIndex = 0;
+    let crossfading = false;
+    let crossfadeStart = 0;
+    let raf = 0;
+
+    const videos = [videoA, videoB];
+
+    const safePlay = (video: HTMLVideoElement) => {
+      const promise = video.play();
+      if (promise) promise.catch(() => {});
+    };
+
+    const resetVideo = (video: HTMLVideoElement) => {
+      video.pause();
+      try {
+        video.currentTime = 0;
+      } catch {}
+    };
+
+    videoA.style.opacity = "1";
+    videoB.style.opacity = "0";
+    videoA.muted = true;
+    videoB.muted = true;
+
+    const start = () => {
+      resetVideo(videoA);
+      resetVideo(videoB);
+      videoA.style.opacity = "1";
+      videoB.style.opacity = "0";
+      activeIndex = 0;
+      crossfading = false;
+      safePlay(videoA);
+    };
+
+    const tick = (now: number) => {
+      const active = videos[activeIndex];
+      const incoming = videos[1 - activeIndex];
+      const duration =
+        Number.isFinite(active.duration) && active.duration > 0
+          ? active.duration
+          : 8;
+
+      if (
+        !crossfading &&
+        active.currentTime >= Math.max(0, duration - CROSSFADE_SECONDS)
+      ) {
+        crossfading = true;
+        crossfadeStart = now;
+        try {
+          incoming.currentTime = 0;
+        } catch {}
+        incoming.style.opacity = "0";
+        safePlay(incoming);
+      }
+
+      if (crossfading) {
+        const progress = Math.min(
+          1,
+          (now - crossfadeStart) / (CROSSFADE_SECONDS * 1000),
+        );
+        // Smoothstep: evita que se perciba un cambio de luminosidad brusco.
+        const eased = progress * progress * (3 - 2 * progress);
+        active.style.opacity = String(1 - eased);
+        incoming.style.opacity = String(eased);
+
+        if (progress >= 1) {
+          resetVideo(active);
+          active.style.opacity = "0";
+          incoming.style.opacity = "1";
+          activeIndex = 1 - activeIndex;
+          crossfading = false;
+        }
+      }
+
+      raf = requestAnimationFrame(tick);
+    };
+
+    const onCanPlay = () => {
+      if (videoA.paused && videoB.paused) start();
+    };
+
+    videoA.addEventListener("canplay", onCanPlay, { once: true });
+    videoB.addEventListener("canplay", onCanPlay, { once: true });
+    start();
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      videoA.removeEventListener("canplay", onCanPlay);
+      videoB.removeEventListener("canplay", onCanPlay);
+      resetVideo(videoA);
+      resetVideo(videoB);
+    };
+  }, []);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const loopContainers = Array.from(
+      root.querySelectorAll<HTMLElement>(".feel-smooth-loop"),
+    );
+
+    const cleanups = loopContainers.map((container) => {
+      const videos = Array.from(
+        container.querySelectorAll<HTMLVideoElement>("video"),
+      );
+
+      if (videos.length !== 2) return () => {};
+
+      const [videoA, videoB] = videos;
+      const CROSSFADE_SECONDS = 0.9;
+      let activeIndex = 0;
+      let crossfading = false;
+      let crossfadeStart = 0;
+      let raf = 0;
+
+      const safePlay = (video: HTMLVideoElement) => {
+        const promise = video.play();
+        if (promise) promise.catch(() => {});
+      };
+
+      const resetVideo = (video: HTMLVideoElement) => {
+        video.pause();
+        try {
+          video.currentTime = 0;
+        } catch {}
+      };
+
+      const start = () => {
+        resetVideo(videoA);
+        resetVideo(videoB);
+        videoA.style.opacity = "1";
+        videoB.style.opacity = "0";
+        activeIndex = 0;
+        crossfading = false;
+        safePlay(videoA);
+      };
+
+      const tick = (now: number) => {
+        const active = videos[activeIndex];
+        const incoming = videos[1 - activeIndex];
+        const duration =
+          Number.isFinite(active.duration) && active.duration > 0
+            ? active.duration
+            : 8;
+
+        if (
+          !crossfading &&
+          active.currentTime >= Math.max(0, duration - CROSSFADE_SECONDS)
+        ) {
+          crossfading = true;
+          crossfadeStart = now;
+          try {
+            incoming.currentTime = 0;
+          } catch {}
+          incoming.style.opacity = "0";
+          safePlay(incoming);
+        }
+
+        if (crossfading) {
+          const progress = Math.min(
+            1,
+            (now - crossfadeStart) / (CROSSFADE_SECONDS * 1000),
+          );
+          const eased = progress * progress * (3 - 2 * progress);
+          active.style.opacity = String(1 - eased);
+          incoming.style.opacity = String(eased);
+
+          if (progress >= 1) {
+            resetVideo(active);
+            active.style.opacity = "0";
+            incoming.style.opacity = "1";
+            activeIndex = 1 - activeIndex;
+            crossfading = false;
+          }
+        }
+
+        raf = requestAnimationFrame(tick);
+      };
+
+      start();
+      raf = requestAnimationFrame(tick);
+
+      return () => {
+        cancelAnimationFrame(raf);
+        resetVideo(videoA);
+        resetVideo(videoB);
+      };
+    });
+
+    return () => cleanups.forEach((cleanup) => cleanup());
+  }, []);
+
+  useEffect(() => {
     const root = rootRef.current;
     const stage = stageRef.current;
+    const feelBackground = feelBackgroundRef.current;
     // Cuando FEEL se monta dentro del overlay de "Más allá del aula",
     // el body permanece bloqueado. En ese caso usamos el contenedor
     // desplazable del propio overlay como scroller de ScrollTrigger.
     const feelScrollRoot =
       root?.closest<HTMLElement>("[data-feel-scroll-root]") ?? null;
     const scrollTriggerScroller = feelScrollRoot ?? undefined;
+
+    const externalScrollChevron =
+      feelScrollRoot?.parentElement?.querySelector<HTMLElement>(".feel-scroll-chevron") ?? null;
+
+    const setScrollIndicatorDirection = (direction: "down" | "up") => {
+      if (!externalScrollChevron) return;
+
+      externalScrollChevron.getAnimations().forEach((animation) => animation.cancel());
+      externalScrollChevron.style.animation = "none";
+
+      if (direction === "up") {
+        externalScrollChevron.style.borderRight = "0";
+        externalScrollChevron.style.borderBottom = "0";
+        externalScrollChevron.style.borderLeft = "3px solid rgba(255, 255, 255, 0.96)";
+        externalScrollChevron.style.borderTop = "3px solid rgba(255, 255, 255, 0.96)";
+
+        externalScrollChevron.animate(
+          [
+            { opacity: 0.34, transform: "translateY(5px) rotate(45deg)" },
+            { opacity: 1, transform: "translateY(-4px) rotate(45deg)" },
+            { opacity: 0.34, transform: "translateY(5px) rotate(45deg)" },
+          ],
+          { duration: 1650, iterations: Infinity, easing: "ease-in-out" },
+        );
+      } else {
+        externalScrollChevron.style.borderLeft = "0";
+        externalScrollChevron.style.borderTop = "0";
+        externalScrollChevron.style.borderRight = "3px solid rgba(255, 255, 255, 0.96)";
+        externalScrollChevron.style.borderBottom = "3px solid rgba(255, 255, 255, 0.96)";
+
+        externalScrollChevron.animate(
+          [
+            { opacity: 0.34, transform: "translateY(-3px) rotate(45deg)" },
+            { opacity: 1, transform: "translateY(5px) rotate(45deg)" },
+            { opacity: 0.34, transform: "translateY(-3px) rotate(45deg)" },
+          ],
+          { duration: 1650, iterations: Infinity, easing: "ease-in-out" },
+        );
+      }
+    };
+
+    setScrollIndicatorDirection("down");
     const heart = heartRef.current;
     const heartSource = heartSourceRef.current;
     const heartVisual = heartVisualRef.current;
@@ -729,6 +977,7 @@ export default function FeelHero() {
     else treeImage.addEventListener("load", onTreeReady, { once: true });
 
     const gsapContext = gsap.context(() => {
+      gsap.set(feelBackground, { opacity: 1 });
       gsap.set([eyebrow, aula, feel, copy], { autoAlpha: 0 });
       gsap.set(tree, { xPercent: 2.2 });
       gsap.set(lavenderCanvas, { autoAlpha: 0, y: 10 });
@@ -1020,6 +1269,15 @@ export default function FeelHero() {
 
       horizontalTimeline
         .to(
+          feelBackground,
+          {
+            opacity: 0,
+            duration: 0.30,
+            ease: "sine.inOut",
+          },
+          0.02,
+        )
+        .to(
           [eyebrow, accent, aula, feel, copy],
           {
             xPercent: -145,
@@ -1272,6 +1530,7 @@ export default function FeelHero() {
           scale: 1,
         });
 
+        gsap.set(feelBackground, { opacity: 1 });
         gsap.set([tree, whitePanel, feel2Text], {
           opacity: 1,
         });
@@ -1795,6 +2054,7 @@ export default function FeelHero() {
         });
 
         const resetFeel4 = () => {
+          setScrollIndicatorDirection("down");
           feel4TransitionTimeline?.kill();
           feel4TransitionTimeline = null;
           feel4TransitionStarted = false;
@@ -1838,6 +2098,7 @@ export default function FeelHero() {
         const playFeel4Transition = () => {
           if (feel4TransitionStarted || !feel3CornerCube) return;
           feel4TransitionStarted = true;
+          setScrollIndicatorDirection("up");
 
           feel3ParticlesEnabled = false;
           feel3CubeParticlesEnabled = false;
@@ -2558,6 +2819,10 @@ export default function FeelHero() {
       feel3CubeParticlesEnabled = false;
       feel4HeartParticlesEnabled = false;
       feel4TransitionTimeline?.kill();
+      externalScrollChevron?.getAnimations().forEach((animation) => animation.cancel());
+      if (externalScrollChevron) {
+        externalScrollChevron.removeAttribute("style");
+      }
       sphereVideo.pause();
       feel3BalloonVideo.pause();
       gsapContext.revert();
@@ -2594,6 +2859,32 @@ export default function FeelHero() {
           height: 100svh;
           min-height: 680px;
           overflow: hidden;
+        }
+
+        .feel-video-background {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+          pointer-events: none;
+          background: #895b8a;
+          will-change: opacity;
+        }
+
+        .feel-video-background video {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+          display: block;
+          pointer-events: none;
+          will-change: opacity;
+        }
+
+        .feel-video-background video + video {
+          opacity: 0;
         }
 
         .feel-eyebrow {
@@ -2949,6 +3240,40 @@ export default function FeelHero() {
           will-change: clip-path;
         }
 
+        .feel-section-video-background {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+        .feel-section-video-background video {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          display: block;
+          object-fit: cover;
+          object-position: center;
+          pointer-events: none;
+          will-change: opacity, transform;
+        }
+
+        .feel-section-video-background video + video {
+          opacity: 0;
+        }
+
+        /* FEEL3: espejo horizontal para que el flujo visual cambie respecto a FEEL1. */
+        .feel3-video-background video {
+          transform: scaleX(-1);
+        }
+
+        /* FEEL4: espejo vertical. */
+        .feel4-video-background video {
+          transform: scaleY(-1);
+        }
+
         .feel3-branch {
           position: absolute;
           z-index: 2;
@@ -3237,7 +3562,7 @@ export default function FeelHero() {
 
         .feel4-lower-gradient {
           position: absolute;
-          z-index: 0;
+          z-index: 1;
           left: 0;
           right: 0;
           top: 49.87%;
@@ -3252,7 +3577,7 @@ export default function FeelHero() {
 
         .feel4-particles-bg {
           position: absolute;
-          z-index: 1;
+          z-index: 2;
           left: 25.90%;
           top: -25.13%;
           width: 80.56%;
@@ -3558,6 +3883,28 @@ export default function FeelHero() {
 
       <div ref={stageRef} className="feel-stage">
         <div
+          ref={feelBackgroundRef}
+          className="feel-video-background"
+          aria-hidden="true"
+        >
+          <video
+            ref={feelBackgroundARef}
+            src={FEEL_ASSETS.feelBackground}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+          />
+          <video
+            ref={feelBackgroundBRef}
+            src={FEEL_ASSETS.feelBackground}
+            muted
+            playsInline
+            preload="auto"
+          />
+        </div>
+
+        <div
           ref={feel4MorphWrapRef}
           className="feel4-morph-wrap"
           aria-hidden="true"
@@ -3745,6 +4092,25 @@ export default function FeelHero() {
           className="feel3-layer"
           aria-label="¿Qué es el aula FEEL?"
         >
+          <div
+            className="feel-section-video-background feel3-video-background feel-smooth-loop"
+            aria-hidden="true"
+          >
+            <video
+              src={FEEL_ASSETS.feelBackground}
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+            />
+            <video
+              src={FEEL_ASSETS.feelBackground}
+              muted
+              playsInline
+              preload="auto"
+            />
+          </div>
+
           <img
             className="feel3-branch"
             src={FEEL_ASSETS.feelBranch}
@@ -3856,6 +4222,25 @@ export default function FeelHero() {
           className="feel4-layer"
           aria-labelledby="feel4-title"
         >
+          <div
+            className="feel-section-video-background feel4-video-background feel-smooth-loop"
+            aria-hidden="true"
+          >
+            <video
+              src={FEEL_ASSETS.feelBackground}
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+            />
+            <video
+              src={FEEL_ASSETS.feelBackground}
+              muted
+              playsInline
+              preload="auto"
+            />
+          </div>
+
           <canvas
             ref={feel4ParticlesRef}
             className="feel4-particles"
