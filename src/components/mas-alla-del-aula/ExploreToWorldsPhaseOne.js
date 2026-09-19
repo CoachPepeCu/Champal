@@ -578,7 +578,31 @@ export default function ExploreToWorldsPhaseOne() {
         >
           {planetOverlay.id === "cambridge" && <Cambridge />}
           {planetOverlay.id === "rayados" && <Rayados />}
-          {planetOverlay.id === "craft" && <CraftSection />}
+          {planetOverlay.id === "craft" && (
+            <div
+              className="craft-overlay-scroller"
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100dvh",
+                overflowY: "auto",
+                overflowX: "hidden",
+                overscrollBehavior: "contain",
+                WebkitOverflowScrolling: "touch",
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
+              <CraftSection />
+              <style>{`
+                .craft-overlay-scroller::-webkit-scrollbar {
+                  width: 0;
+                  height: 0;
+                  display: none;
+                }
+              `}</style>
+            </div>
+          )}
           {planetOverlay.id === "feel" && (
             <div
               className="feel-overlay-shell"
