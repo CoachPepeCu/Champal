@@ -7,11 +7,10 @@ export const campusAreas = [
     "label": "Salones",
     "icon": "/images/conoce-champal/campus/icon-01.webp",
     "photos": [
-      "/images/Explora/Campus/01/03%20juegos%2001.webp",
-      "/images/Explora/Campus/01/Champal%20Explora%2003.webp",
-      "/images/Explora/Campus/01/Champal%20Explora%2015.webp",
-      "/images/Explora/Campus/01/Champal%20Explora%2017.webp",
-      "/images/Explora/Campus/01/Champal%20Explora%2018.webp"
+      "/images/Explora/Campus/01/Sal01.webp",
+      "/images/Explora/Campus/01/Sal02.webp",
+      "/images/Explora/Campus/01/Sal03.webp",
+      "/images/Explora/Campus/01/Sal04.webp"
     ]
   },
   {
@@ -20,6 +19,8 @@ export const campusAreas = [
     "icon": "/images/conoce-champal/campus/icon-02.webp",
     "photos": [
       "/images/Explora/Campus/02/02%20Biblioteca%2001.webp",
+      "/images/Explora/Campus/02/Bibl01.webp",
+      "/images/Explora/Campus/02/Bibl02.webp",
       "/images/Explora/Campus/02/Champal%20Explora%2004.webp",
       "/images/Explora/Campus/02/Champal%20Explora%2005.webp",
       "/images/Explora/Campus/02/Champal%20Explora%2006.webp"
@@ -30,9 +31,12 @@ export const campusAreas = [
     "label": "Juegos",
     "icon": "/images/conoce-champal/campus/icon-03.webp",
     "photos": [
+      "/images/Explora/Campus/03/03%20juegos%2001.webp",
       "/images/Explora/Campus/03/Champal%20Explora%2022.webp",
       "/images/Explora/Campus/03/Champal%20Explora%2025.webp",
-      "/images/Explora/Campus/03/Champal%20Explora%2026.webp"
+      "/images/Explora/Campus/03/Champal%20Explora%2026.webp",
+      "/images/Explora/Campus/03/ju01.webp",
+      "/images/Explora/Campus/03/ju02.webp"
     ]
   },
   {
@@ -42,6 +46,7 @@ export const campusAreas = [
     "photos": [
       "/images/Explora/Campus/04/04%20Verdes%2001.webp",
       "/images/Explora/Campus/04/04%20Verdes%2002.webp",
+      "/images/Explora/Campus/04/AV01.webp",
       "/images/Explora/Campus/04/Champal%20Explora%2016.webp",
       "/images/Explora/Campus/04/Champal%20Explora%2027.webp"
     ]
@@ -56,6 +61,9 @@ export const campusAreas = [
       "/images/Explora/Campus/05/Champal%20Explora%2001.webp",
       "/images/Explora/Campus/05/Champal%20Explora%2020.webp",
       "/images/Explora/Campus/05/Champal%20Explora%2021.webp",
+      "/images/Explora/Campus/05/ED01.webp",
+      "/images/Explora/Campus/05/ED02.webp",
+      "/images/Explora/Campus/05/ED03.webp",
       "/images/Explora/Campus/05/Exterior%20Champal%2002.png",
       "/images/Explora/Campus/05/Exterior%20Champal.png"
     ]
@@ -65,14 +73,17 @@ export const campusAreas = [
     "label": "Laboratorio",
     "icon": "/images/conoce-champal/campus/icon-06.webp",
     "photos": [
-      "/images/Explora/Campus/06/Champal%20Explora%2014.webp"
+      "/images/Explora/Campus/06/Champal%20Explora%2014.webp",
+      "/images/Explora/Campus/06/Lab01.webp"
     ]
   },
   {
     "id": "07",
     "label": "Servicio médico",
     "icon": "/images/conoce-champal/campus/icon-07.webp",
-    "photos": []
+    "photos": [
+      "/images/Explora/Campus/07/SM01.webp"
+    ]
   },
   {
     "id": "08",
@@ -95,7 +106,9 @@ export const campusAreas = [
     "label": "Wi‑Fi",
     "icon": "/images/conoce-champal/campus/icon-10.webp",
     "photos": [
-      "/images/Explora/Campus/10/10%20Wifi%2001.webp"
+      "/images/Explora/Campus/10/10%20Wifi%2001.webp",
+      "/images/Explora/Campus/10/wi01.webp",
+      "/images/Explora/Campus/10/wi02.webp"
     ]
   },
   {
@@ -117,7 +130,9 @@ export const campusAreas = [
       "/images/Explora/Campus/12/12%20Maker%2001.webp",
       "/images/Explora/Campus/12/12%20Maker.webp",
       "/images/Explora/Campus/12/Champal%20Explora%2002.webp",
-      "/images/Explora/Campus/12/Champal%20Explora%2009.webp"
+      "/images/Explora/Campus/12/Champal%20Explora%2009.webp",
+      "/images/Explora/Campus/12/MK01.webp",
+      "/images/Explora/Campus/12/MK02.webp"
     ]
   },
   {
@@ -142,7 +157,8 @@ export const campusAreas = [
     "icon": "/images/conoce-champal/campus/icon-15.webp",
     "photos": [
       "/images/Explora/Campus/15/15%20Auditorio%2001.webp",
-      "/images/Explora/Campus/15/15%20Auditorio%2002.webp"
+      "/images/Explora/Campus/15/15%20Auditorio%2002.webp",
+      "/images/Explora/Campus/15/AU01.webp"
     ]
   }
 ];
